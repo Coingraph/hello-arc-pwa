@@ -6,7 +6,7 @@
   <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=16" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=17" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -42,11 +42,11 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar - Motion Center Logo */
+    /* Top Bar - Fixed, Centered Logo */
     .topbar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      height: 70px;
+      height: 64px;
       background: rgba(15, 23, 42, 0.98);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
@@ -55,19 +55,11 @@
       justify-content: space-between;
       padding: 0 16px;
       z-index: 1000;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .topbar.hidden {
-      transform: translateY(-100%);
-    }
-    .topbar.scrolled {
-      height: 60px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     }
 
     /* Side Buttons */
     .topbar-left, .topbar-right {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 12px;
     }
     .topbar-btn {
       width: 44px; height: 44px;
@@ -75,49 +67,32 @@
       display: flex;
       align-items: center; justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
       font-size: 17px;
       color: var(--text);
+      transition: background 0.2s;
     }
     .topbar-btn.active {
       background: var(--yellow);
       color: #0F172A;
       font-weight: 700;
-      transform: scale(1.05);
     }
     .topbar-btn:hover { background: rgba(251, 191, 36, 0.15); }
 
-    /* Center Logo - Motion */
+    /* Center Logo - Fixed, No Motion */
     .logo-center {
       position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
+      left: 50%;
+      transform: translateX(-50%);
       display: flex; align-items: center; gap: 8px;
-      font-size: 22px; font-weight: 800; color: white;
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-    }
-    .topbar.show-logo .logo-center {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    .topbar.scrolled .logo-center {
-      font-size: 18px;
-      gap: 6px;
+      font-size: 21px; font-weight: 800; color: white;
     }
     .logo-center img {
-      height: 36px;
-      transition: all 0.3s ease;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    }
-    .topbar.scrolled .logo-center img {
-      height: 30px;
+      height: 34px;
     }
 
-    /* Main */
+    /* Main - Full Vertical Scroll */
     .main {
-      padding: 90px 16px 120px;
+      padding: 80px 16px 120px;
       min-height: 100vh;
     }
 
@@ -159,7 +134,6 @@
       border-radius: 14px; border: none;
       font-weight: 700; font-size: 16px;
       cursor: pointer; margin-top: 10px;
-      transition: 0.2s;
     }
     .swap-btn { background: linear-gradient(90deg, var(--green), #34D399); color: white; }
     .swap-btn:disabled { background: #334155; }
@@ -228,8 +202,8 @@
 </head>
 <body>
 
-  <!-- Top Bar - Motion Center Logo -->
-  <div class="topbar" id="topbar">
+  <!-- Top Bar - Fixed, Centered Logo (No Motion) -->
+  <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-btn active" id="btn-swap" onclick="showSection('swap')">
         <i class="fas fa-arrow-right-arrow-left"></i>
@@ -239,8 +213,8 @@
       </div>
     </div>
 
-    <!-- Center Logo with Motion -->
-    <div class="logo-center" id="logo-center">
+    <!-- Center Logo - Fixed -->
+    <div class="logo-center">
       <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
       <span>ZapDEX</span>
     </div>
@@ -252,7 +226,7 @@
     </div>
   </div>
 
-  <!-- Main -->
+  <!-- Main - Vertical Scroll -->
   <div class="main">
 
     <!-- Swap -->
@@ -303,14 +277,14 @@
       </div>
     </div>
 
-    <!-- Extra Scrollable Content -->
+    <!-- Extra Vertical Content -->
     <div class="extra-content">
       <h3>Privacy First</h3>
       <p>All swaps are FHE-encrypted. Messages are sent via XMTP. Files stored on IPFS.</p>
     </div>
     <div class="extra-content">
       <h3>Arc Testnet</h3>
-      <p>Connected to Arc Network. Test USDC ↔ USDT swaps with full privacy.</p>
+      <p>Connected to Arc Network. Test USDC to USDT swaps with full privacy.</p>
     </div>
     <div class="extra-content">
       <h3>Zama + XMTP</h3>
@@ -340,28 +314,6 @@
 
   <script>
     let provider, account, xmtpClient, fheInstance, w3;
-    let lastScroll = 0;
-
-    // Motion Logo + Hide/Show
-    window.addEventListener('scroll', () => {
-      const topbar = document.getElementById('topbar');
-      const logo = document.getElementById('logo-center');
-      const currentScroll = window.scrollY;
-
-      if (currentScroll > lastScroll && currentScroll > 100) {
-        topbar.classList.add('hidden');
-      } else if (currentScroll < lastScroll) {
-        topbar.classList.remove('hidden');
-      }
-
-      if (currentScroll > 50) {
-        topbar.classList.add('scrolled', 'show-logo');
-      } else {
-        topbar.classList.remove('scrolled', 'show-logo');
-      }
-
-      lastScroll = currentScroll;
-    });
 
     function showSection(section) {
       document.querySelectorAll('.topbar-btn').forEach(b => b.classList.remove('active'));
@@ -373,7 +325,7 @@
 
     async function connectWallet(name) {
       let eth = window.ethereum;
-      if (1 === 'okx' && window.okxwallet) eth = window.okxwallet;
+      if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
       if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
       if (!eth) return alert(`Install ${name}`);
 
@@ -444,7 +396,7 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=16');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=17');
     }
   </script>
 </body>
