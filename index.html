@@ -6,7 +6,7 @@
   <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=13" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=14" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -42,73 +42,50 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Layout */
-    .app { display: flex; flex-direction: column; min-height: 100vh; position: relative; }
-
-    /* Header */
-    .header {
-      padding: 14px 16px;
-      text-align: center;
-      background: linear-gradient(135deg, var(--green), var(--blue));
-      border-radius: 0 0 20px 20px;
-      position: relative;
-      z-index: 10;
-    }
-    .header img { height: 36px; }
-    .header h1 { font-size: 22px; font-weight: 700; margin-top: 6px; color: white; }
-
-    /* Sidebar Toggle */
-    .sidebar-toggle {
+    /* Top Bar */
+    .topbar {
       position: fixed;
-      left: 12px; top: 12px; z-index: 1001;
-      background: rgba(30, 41, 59, 0.95);
-      border: 1px solid var(--border);
+      top: 0; left: 0; right: 0;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+    .topbar-left {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .topbar-btn {
       width: 44px; height: 44px;
       border-radius: 14px;
       display: flex;
       align-items: center; justify-content: center;
       cursor: pointer;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .sidebar-toggle i { font-size: 18px; color: var(--text); }
-
-    /* Sidebar */
-    .sidebar {
-      position: fixed;
-      left: -100px; top: 0; bottom: 0;
-      width: 76px;
-      background: rgba(15, 23, 42, 0.98);
-      backdrop-filter: blur(14px);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      align-items: center;
-      padding-top: 76px;
-      transition: left 0.3s ease;
-      z-index: 1000;
-    }
-    .sidebar.open { left: 0; }
-    .sidebar-logo { width: 42px; height: 42px; margin-bottom: 20px; }
-    .nav-item {
-      width: 50px; height: 50px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center; justify-content: center;
-      margin-bottom: 12px;
-      cursor: pointer;
       transition: 0.2s;
+      font-size: 17px;
+      color: var(--text);
     }
-    .nav-item:hover { background: rgba(251, 191, 36, 0.15); }
-    .nav-item.active { background: var(--yellow); color: #0F172A; }
-    .nav-item i { font-size: 18px; }
+    .topbar-btn.active {
+      background: var(--yellow);
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .topbar-btn:hover { background: rgba(251, 191, 36, 0.15); }
+
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 20px; font-weight: 700; color: white;
+    }
+    .logo img { height: 34px; }
 
     /* Main */
     .main {
-      flex: 1;
       padding: 76px 16px 20px;
-      transition: margin-left 0.3s ease;
+      min-height: 100vh;
     }
-    .main.shift { margin-left: 76px; }
 
     .card {
       background: var(--card);
@@ -197,12 +174,8 @@
     }
     .modal-title { text-align: center; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: white; }
 
-    /* Responsive */
     @media (min-width: 480px) {
-      .sidebar { left: 0; }
-      .sidebar-toggle { display: none; }
-      .main { margin-left: 76px; padding-top: 20px; }
-      .main.shift { margin-left: 76px; }
+      .topbar { padding: 14px 20px; }
       .modal-content { border-radius: 20px; max-width: 380px; }
       .modal { align-items: center; }
     }
@@ -210,86 +183,76 @@
 </head>
 <body>
 
-  <div class="app">
-
-    <!-- Sidebar Toggle -->
-    <div class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">
-      <i class="fas fa-bars"></i>
-    </div>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX" class="sidebar-logo">
-      <div class="nav-item active" id="nav-swap" onclick="showSection('swap')">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-btn active" id="btn-swap" onclick="showSection('swap')">
         <i class="fas fa-arrow-right-arrow-left"></i>
       </div>
-      <div class="nav-item" id="nav-messages" onclick="showSection('messages')">
+      <div class="topbar-btn" id="btn-messages" onclick="showSection('messages')">
         <i class="fas fa-envelope"></i>
       </div>
-      <div class="nav-item" id="nav-staking" onclick="showSection('staking')">
+      <div class="topbar-btn" id="btn-staking" onclick="showSection('staking')">
         <i class="fas fa-coins"></i>
       </div>
     </div>
-
-    <!-- Main -->
-    <div class="main" id="main">
-
-      <!-- Swap -->
-      <div id="swap-section">
-        <div class="header">
-          <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
-          <h1>ZapDEX</h1>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Swap <span class="badge">FHE</span></div>
-          <div class="token-row">
-            <input type="number" id="from-amount" placeholder="0.0" />
-            <div>
-              <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon">
-              <span class="token-name">USDC</span>
-            </div>
-          </div>
-          <div class="swap-arrow">Down Arrow</div>
-          <div class="token-row">
-            <input type="number" id="to-amount" placeholder="0.0" disabled />
-            <div>
-              <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="token-icon">
-              <span class="token-name">USDT</span>
-            </div>
-          </div>
-          <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Connect to Swap</button>
-          <div id="swap-status" class="status"></div>
-        </div>
-
-        <div id="connect-btn" onclick="openWalletModal()">Connect Wallet</div>
-      </div>
-
-      <!-- Messages -->
-      <div id="messages-section" style="display:none;">
-        <div class="header"><h1>Messages</h1></div>
-        <div class="card">
-          <div class="card-title">Send <span class="badge">IPFS</span></div>
-          <input type="file" id="file-input" class="file-input">
-          <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
-          <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="2"></textarea>
-          <button class="btn send-btn" onclick="sendMessage()">Send</button>
-          <div id="msg-status" class="status"></div>
-        </div>
-      </div>
-
-      <!-- Staking -->
-      <div id="staking-section" style="display:none;">
-        <div class="header"><h1>Staking</h1></div>
-        <div class="card">
-          <div class="card-title">Stake USDC</div>
-          <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:12px;">
-          <button class="btn" style="background:var(--yellow);color:#0F172A;">Stake</button>
-          <div class="status" style="color:var(--muted);margin-top:8px;">APY: <strong style="color:var(--green);">12.5%</strong></div>
-        </div>
-      </div>
-
+    <div class="logo">
+      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
+      <span>ZapDEX</span>
     </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Swap -->
+    <div id="swap-section">
+      <div class="card">
+        <div class="card-title">Swap <span class="badge">FHE</span></div>
+        <div class="token-row">
+          <input type="number" id="from-amount" placeholder="0.0" />
+          <div>
+            <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon">
+            <span class="token-name">USDC</span>
+          </div>
+        </div>
+        <div class="swap-arrow">Down Arrow</div>
+        <div class="token-row">
+          <input type="number" id="to-amount" placeholder="0.0" disabled />
+          <div>
+            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="token-icon">
+            <span class="token-name">USDT</span>
+          </div>
+        </div>
+        <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Connect to Swap</button>
+        <div id="swap-status" class="status"></div>
+      </div>
+
+      <div id="connect-btn" onclick="openWalletModal()">Connect Wallet</div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages-section" style="display:none;">
+      <div class="card">
+        <div class="card-title">Send <span class="badge">IPFS</span></div>
+        <input type="file" id="file-input" class="file-input">
+        <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
+        <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="2"></textarea>
+        <button class="btn send-btn" onclick="sendMessage()">Send</button>
+        <div id="msg-status" class="status"></div>
+      </div>
+    </div>
+
+    <!-- Staking -->
+    <div id="staking-section" style="display:none;">
+      <div class="card">
+        <div class="card-title">Stake USDC</div>
+        <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:12px;">
+        <button class="btn" style="background:var(--yellow);color:#0F172A;">Stake</button>
+        <div class="status" style="color:var(--muted);margin-top:8px;">APY: <strong style="color:var(--green);">12.5%</strong></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Wallet Modal -->
@@ -314,24 +277,14 @@
   <script>
     let provider, account, xmtpClient, fheInstance, w3;
 
-    // === Sidebar ===
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const main = document.getElementById('main');
-      sidebar.classList.toggle('open');
-      main.classList.toggle('shift');
-    }
-
     function showSection(section) {
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      document.getElementById(`nav-${section}`).classList.add('active');
+      document.querySelectorAll('.topbar-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`btn-${section}`).classList.add('active');
       ['swap', 'messages', 'staking'].forEach(s => {
         document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
       });
-      if (window.innerWidth < 480) toggleSidebar();
     }
 
-    // === Wallet ===
     async function connectWallet(name) {
       let eth = window.ethereum;
       if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
@@ -351,43 +304,25 @@
       } catch(e) { alert(e.message); }
     }
 
-    function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
-    function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('show'); }
-
-    // === Init ===
     async function initAll() {
-      await initFHE();
-      await initXMTP();
-      await initW3();
-    }
-
-    async function initFHE() {
       if (window.fhevm) fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 });
-    }
-
-    async function initXMTP() {
       if (provider) xmtpClient = await XMTP.Client.create(provider.getSigner());
-    }
-
-    async function initW3() {
       try {
         w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBERVgifQ.9kR8v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2' });
-      } catch(e) { console.log("W3 init skipped"); }
+      } catch(e) {}
     }
 
-    // === Swap ===
     async function swapTokens() {
       const amt = document.getElementById('from-amount').value;
       if (!amt) return;
-      const status = document.getElementById('swap-status');
-      status.textContent = "Processing...";
+      const s = document.getElementById('swap-status');
+      s.textContent = "Swapping...";
       setTimeout(() => {
         document.getElementById('to-amount').value = amt;
-        status.textContent = "Swapped!";
+        s.textContent = "Swapped!";
       }, 1200);
     }
 
-    // === Send Message + IPFS ===
     async function sendMessage() {
       if (!account) return alert("Connect wallet");
       const to = document.getElementById('msg-recipient').value.trim();
@@ -395,8 +330,8 @@
       const file = document.getElementById('file-input').files[0];
       if (!to) return alert("Enter recipient");
 
-      const status = document.getElementById('msg-status');
-      status.textContent = "Uploading...";
+      const s = document.getElementById('msg-status');
+      s.textContent = "Uploading...";
 
       try {
         let cid = "";
@@ -404,29 +339,27 @@
           const { cid: fileCid } = await w3.uploadFile(file);
           cid = fileCid.toString();
         }
-
         if (xmtpClient) {
           const conv = await xmtpClient.conversations.newConversation(to);
           await conv.send({ text, file: cid || null });
         }
-
-        status.textContent = cid ? `Sent! CID: ${cid.slice(0,12)}...` : "Sent!";
+        s.textContent = cid ? `Sent! CID: ${cid.slice(0,12)}...` : "Sent!";
         document.getElementById('msg-text').value = "";
         document.getElementById('file-input').value = "";
       } catch(e) {
-        status.textContent = "Failed";
+        s.textContent = "Failed";
       }
     }
 
-    // === PWA ===
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=13');
-    }
-
-    // Close modal on outside click
+    function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
+    function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('show'); }
     document.getElementById('wallet-modal').addEventListener('click', e => {
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=14');
+    }
   </script>
 </body>
 </html>
