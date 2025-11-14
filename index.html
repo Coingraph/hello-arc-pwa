@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arc Testnet Monitor</title>
+
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#38bdf8" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <style>
+    body { font-family: Tahoma; background: #0f172a; color: #e2e8f0; padding: 20px; margin: 0; }
+    .c { max-width: 700px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; }
+    h1 { color: #38bdf8; text-align: center; margin: 0 0 20px; }
+    .card { background: #334155; padding: 14px; border-radius: 10px; margin: 12px 0; }
+    .l { color: #94a3b8; font-weight: bold; }
+    .v { color: #fff; }
+    code { background: #1e40af; padding: 2px 6px; border-radius: 4px; }
+    #install-btn { display: block !important; background: #38bdf8; color: #0f172a; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="c">
+    <h1>Arc Testnet Monitor</h1>
+    <div class="card">
+      <div class="l">المحفظة</div>
+      <div class="v"><code id="wallet">جاري التحميل...</code></div>
+      <div class="v">الرصيد: <span id="w">-</span> USDC</div>
+    </div>
+    <div class="card">
+      <div class="l">العقدة</div>
+      <div class="v">Chain ID: <span id="cid">-</span></div>
+      <div class="v">Block: <span id="blk">-</span></div>
+      <div class="v">Gas: <span id="gas">-</span></div>
+    </div>
+    <div class="card">
+      <div class="l">العقد الذكي</div>
+      <div class="v">عنوان: <code id="addr">جاري التحميل...</code></div>
+      <div class="v">التحية: <span id="greet">-</span></div>
+      <div class="v">الرصيد: <span id="bal">-</span> USDC</div>
+    </div>
+    <button id="install-btn">تثبيت التطبيق</button>
+  </div>
+
+  <script>
+    const RPC = "https://rpc.testnet.arc.network";
+    const ADDR = "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697";
+    const WALLET = "0xeEa5b26B94E4e5bA416c9725e51aB755E2ddE107";
+
+    document.getElementById("addr").textContent = ADDR;
+    document.getElementById("wallet").textContent = WALLET;
+
+    async function load() {
+      try {
+        const [cid, blk, gas, greet, bal, wbal] = await Promise.all([
+          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_chainId",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
+          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_blockNumber",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
+          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_gasPrice",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
+          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_call",params:[{to:ADDR,data:"0x9c1bb7d9"},"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=> { if (d.error) return "غير متاح"; const s = d.result.slice(130).replace(/0+$/,''); return new TextDecoder().decode(new Uint8Array(s.match(/.{2}/g).map(b=>parseInt(b,16)))); }),
+          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_getBalance",params:[ADDR,"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
+          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_getBalance",params:[WALLET,"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16))
+        ]);
+        document.getElementById("cid").textContent = cid;
+        document.getElementById("blk").textContent = blk.toLocaleString();
+        document.getElementById("gas").textContent = (gas/1e9).toFixed(2)+" Gwei";
+        document.getElementById("greet").textContent = greet;
+        document.getElementById("bal").textContent = (bal/1e18).toFixed(6);
+        document.getElementById("w").textContent = (wbal/1e18).toFixed(6);
+      } catch(e) { console.error(e); }
+    }
+    setInterval(load, 5000); load();
+
+    // PWA Install Button
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+          console.log('تم تثبيت التطبيق');
+        }
+        deferredPrompt = null;
+      });
+    });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered'))
+          .catch(err => console.log('SW failed: ', err));
+      });
+    }
+  </script>
+</body>
+</html>
