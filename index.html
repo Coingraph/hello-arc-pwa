@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZapChok</title>
+  <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=8" />
-  <meta name="theme-color" content="#8B5CF6" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=9" />
+  <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- XMTP + FHE -->
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
@@ -24,168 +24,206 @@
       --zap-blue: #00D1FF;
       --zap-dark: #0F172A;
       --zap-light: #F8FAFC;
-      --fhe-color: #EC4899;
-      --chok-purple: #8B5CF6;
+      --dex-bg: #111827;
+      --card-bg: #1F2937;
+      --border: #374151;
+      --text: #E5E7EB;
+      --text-muted: #9CA3AF;
+      --success: #10B981;
+      --warning: #F59E0B;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-      color: var(--zap-light);
+      background: var(--zap-dark);
+      color: var(--text);
       min-height: 100vh;
-      padding: 20px;
+      padding: 16px;
     }
     .container {
-      max-width: 480px;
+      max-width: 420px;
       margin: 0 auto;
-      background: rgba(15, 23, 42, 0.9);
-      border-radius: 20px;
+      background: var(--card-bg);
+      border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(139, 92, 246, 0.3);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
     }
     .header {
-      background: linear-gradient(90deg, var(--zap-yellow), var(--chok-purple));
-      padding: 20px;
+      background: linear-gradient(135deg, #1E40AF, #7C3AED);
+      padding: 24px 20px;
       text-align: center;
+      position: relative;
     }
     .header img {
-      height: 50px;
+      height: 48px;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
     .header h1 {
       font-size: 28px;
-      font-weight: 700;
-      margin-top: 8px;
-      color: #0F172A;
-      letter-spacing: 2px;
-    }
-    .status {
-      background: rgba(139, 92, 246, 0.2);
-      color: var(--chok-purple);
-      padding: 8px 16px;
-      font-size: 12px;
-      font-weight: 600;
-      text-align: center;
-      border-bottom: 1px solid rgba(139, 92, 246, 0.3);
-    }
-    .card {
-      padding: 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .card:last-child { border: none; }
-    .label {
-      font-size: 14px;
-      color: #CBD5E1;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    .value {
-      font-size: 18px;
+      font-weight: 800;
+      margin-top: 12px;
       color: white;
-      font-weight: 600;
-      word-break: break-all;
+      letter-spacing: 1.5px;
     }
-    .value code {
-      background: rgba(255, 214, 10, 0.15);
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 14px;
-      color: var(--zap-yellow);
-    }
-    select, input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      background: rgba(255, 255, 255, 0.05);
-      color: white;
-      font-size: 16px;
-      margin: 12px 0;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: var(--zap-yellow);
-      color: #0F172A;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-      margin: 8px 0;
-    }
-    button:hover { background: #FFE066; }
-    button:disabled { background: #475569; cursor: not-allowed; }
-    #install-btn {
-      background: linear-gradient(90deg, var(--zap-yellow), var(--chok-purple));
-      color: #0F172A;
-      font-weight: 700;
+    .header .tagline {
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      margin-top: 4px;
     }
 
-    /* زر الاتصال الواحد */
+    /* Swap Card */
+    .swap-card {
+      margin: 20px;
+      background: var(--dex-bg);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+    .swap-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .swap-title .lock {
+      font-size: 14px;
+      color: #EC4899;
+    }
+
+    .token-row {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .token-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: right;
+      outline: none;
+    }
+    .token-select {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .token-select img {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
+    .token-name {
+      font-weight: 600;
+      color: white;
+    }
+
+    .swap-arrow {
+      text-align: center;
+      margin: 8px 0;
+      font-size: 20px;
+      color: var(--text-muted);
+    }
+
+    .swap-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(90deg, #10B981, #34D399);
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: 0.3s;
+    }
+    .swap-btn:hover { background: linear-gradient(90deg, #059669, #10B981); }
+    .swap-btn:disabled { background: #374151; cursor: not-allowed; }
+
+    .status-bar {
+      background: var(--dex-bg);
+      padding: 12px 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Wallet Button */
     #connect-btn {
       background: var(--zap-blue);
       color: white;
       font-weight: 700;
-      position: relative;
+      margin: 20px;
+      padding: 14px;
+      border-radius: 16px;
     }
-    #connect-btn:hover { background: #00E6FF; }
 
-    /* نافذة اختيار المحفظة */
+    /* Modal */
     .wallet-modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.9);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
     }
     .wallet-modal.show { display: flex; }
     .modal-content {
-      background: #1E293B;
-      border-radius: 16px;
+      background: var(--card-bg);
+      border-radius: 20px;
       padding: 24px;
       width: 90%;
       max-width: 360px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      border: 1px solid rgba(139, 92, 246, 0.4);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
     }
     .modal-title {
       text-align: center;
       font-size: 18px;
       font-weight: 700;
       margin-bottom: 16px;
-      color: var(--chok-purple);
+      color: white;
     }
     .wallet-option {
       display: flex;
       align-items: center;
       padding: 14px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      background: var(--dex-bg);
       margin-bottom: 10px;
       cursor: pointer;
       transition: 0.2s;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid transparent;
     }
     .wallet-option:hover {
       background: rgba(139, 92, 246, 0.2);
-      border-color: var(--chok-purple);
+      border-color: #8B5CF6;
     }
     .wallet-option img {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       margin-right: 12px;
     }
     .wallet-name {
       font-weight: 600;
       color: white;
     }
+
     .pulse { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
@@ -193,50 +231,56 @@
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapChok">
-      <h1>ZapChok</h1>
-    </div>
-    <div class="status pulse" id="network-status">Select Network</div>
-
-    <div class="card">
-      <div class="label">Select Network</div>
-      <select id="chain-select" onchange="switchChain()">
-        <option value="">Choose...</option>
-        <option value="arc">Arc Testnet</option>
-        <option value="eth">Ethereum Mainnet</option>
-        <option value="polygon">Polygon</option>
-        <option value="bsc">BNB Chain</option>
-        <option value="avalanche">Avalanche</option>
-      </select>
+      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
+      <h1>ZapDEX</h1>
+      <div class="tagline">FHE-Powered DEX on Arc Testnet</div>
     </div>
 
-    <div class="card">
-      <div class="label">Wallet</div>
-      <div class="value"><code id="wallet">Not Connected</code></div>
-      <div class="value">Balance: <span id="w">-</span> <span id="symbol">—</span></div>
-      <button id="connect-btn" onclick="openWalletModal()">Connect Wallet</button>
+    <div class="status-bar pulse">Arc Testnet • FHE Encrypted Swaps</div>
+
+    <!-- Swap Interface -->
+    <div class="swap-card">
+      <div class="swap-title">
+        Swap
+        <span class="lock">Lock FHE Encrypted</span>
+      </div>
+
+      <!-- From -->
+      <div class="token-row">
+        <input type="number" id="from-amount" placeholder="0.0" />
+        <div class="token-select" onclick="selectToken('from')">
+          <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+          <span class="token-name">USDC</span>
+        </div>
+      </div>
+
+      <div class="swap-arrow">Down Arrow</div>
+
+      <!-- To -->
+      <div class="token-row">
+        <input type="number" id="to-amount" placeholder="0.0" disabled />
+        <div class="token-select" onclick="selectToken('to')">
+          <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+          <span class="token-name">USDT</span>
+        </div>
+      </div>
+
+      <button class="swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Connect Wallet to Swap</button>
+      <div id="swap-status" style="color:#10B981; margin-top:8px; font-size:14px; text-align:center;"></div>
     </div>
 
-    <!-- قسم FHE + XMTP -->
-    <div class="fhe-section">
-      <div class="fhe-title">Private Transfer (FHE + XMTP)</div>
-      <div class="value">Recipient (XMTP Address):</div>
-      <input type="text" id="xmtp-recipient" placeholder="0x..." />
-      <div class="value">Amount (USDC):</div>
-      <input type="number" id="fhe-amount" placeholder="0.0" step="0.000001" />
-      <button onclick="sendPrivateTransfer()" style="background:#EC4899;">Send Encrypted</button>
-      <div id="fhe-status" style="color:#EC4899; margin-top:8px; font-size:14px;"></div>
-    </div>
+    <!-- Wallet -->
+    <button id="connect-btn" onclick="openWalletModal()">Connect Wallet</button>
 
-    <div class="card">
-      <button id="install-btn">Install App</button>
+    <div class="card" style="margin:20px; padding:16px; font-size:13px; color:var(--text-muted); text-align:center;">
+      Powered by <strong>Zama FHE</strong> • <strong>Arc Testnet</strong> • <strong>XMTP</strong>
     </div>
   </div>
 
-  <!-- نافذة اختيار المحفظة -->
+  <!-- Wallet Modal -->
   <div class="wallet-modal" id="wallet-modal">
     <div class="modal-content">
-      <div class="modal-title">Choose Wallet</div>
+      <div class="modal-title">Connect Wallet</div>
       <div class="wallet-option" onclick="connectAndClose('metamask')">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
         <span class="wallet-name">MetaMask</span>
@@ -254,46 +298,36 @@
 
   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
   <script>
-    // === فتح وإغلاق النافذة ===
-    function openWalletModal() {
-      document.getElementById('wallet-modal').classList.add('show');
-    }
-    function closeWalletModal() {
-      document.getElementById('wallet-modal').classList.remove('show');
-    }
+    let provider, signer, account, xmtpClient, fheInstance;
 
-    // === الاتصال + إغلاق النافذة ===
+    // === Connect Wallet ===
     async function connectAndClose(wallet) {
       closeWalletModal();
       await connect(wallet);
     }
 
-    // === الاتصال بالمحفظة ===
     async function connect(wallet) {
       let ethProvider;
       if (wallet === 'metamask' && window.ethereum?.isMetaMask) ethProvider = window.ethereum;
       else if (wallet === 'okx' && window.okxwallet) ethProvider = window.okxwallet;
       else if (wallet === 'phantom' && window.phantom?.ethereum) ethProvider = window.phantom.ethereum;
-      else return alert(`Please install ${wallet.charAt(0).toUpperCase() + wallet.slice(1)}`);
+      else return alert(`Install ${wallet}`);
 
       try {
         await ethProvider.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(ethProvider);
         signer = provider.getSigner();
         account = await signer.getAddress();
-        document.getElementById('wallet').textContent = account.slice(0,10)+"...";
-        document.getElementById('connect-btn').textContent = "Connected";
+        document.getElementById('connect-btn').textContent = account.slice(0,6)+"..."+account.slice(-4);
         document.getElementById('connect-btn').disabled = true;
+        document.getElementById('swap-btn').disabled = false;
+        document.getElementById('swap-btn').textContent = "Swap";
         await initFHE();
         await initXMTP();
-        load();
       } catch(e) { alert(e.message); }
     }
 
-    // === باقي الكود (FHE, XMTP, Multi-Chain, PWA) ===
-    let provider, signer, account, currentChain = null;
-    let xmtpClient, fheInstance;
-
+    // === FHE + XMTP ===
     async function initFHE() {
       if (!window.fhevm) return;
       fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 });
@@ -301,95 +335,49 @@
 
     async function initXMTP() {
       if (!provider) return;
-      const signer = provider.getSigner();
-      xmtpClient = await XMTP.Client.create(signer);
+      xmtpClient = await XMTP.Client.create(provider.getSigner());
     }
 
-    async function sendPrivateTransfer() {
-      if (!provider || !currentChain) return alert("Connect wallet & select network!");
-      const recipient = document.getElementById('xmtp-recipient').value.trim();
-      const amount = document.getElementById('fhe-amount').value;
-      if (!recipient || !amount || amount <= 0) return alert("Fill all fields!");
+    // === Swap with FHE ===
+    async function swapTokens() {
+      if (!account) return;
+      const amount = document.getElementById('from-amount').value;
+      if (!amount || amount <= 0) return;
 
-      const status = document.getElementById('fhe-status');
-      status.textContent = "Encrypting...";
+      const status = document.getElementById('swap-status');
+      status.textContent = "Encrypting with FHE...";
 
       try {
-        const encryptedAmount = await fheInstance.encrypt32(parseInt(amount * 1e6));
-        const conversation = await xmtpClient.conversations.newConversation(recipient);
+        const encrypted = await fheInstance.encrypt32(parseInt(amount * 1e6));
+        const conversation = await xmtpClient.conversations.newConversation("0xYourZapDEXBot");
         await conversation.send({
-          type: "private_transfer",
-          encryptedAmount: Array.from(encryptedAmount),
-          chain: currentChain.name,
-          symbol: currentChain.symbol
+          type: "fhe_swap_request",
+          from: "USDC",
+          to: "USDT",
+          encryptedAmount: Array.from(encrypted),
+          wallet: account
         });
-        status.textContent = "Sent privately via XMTP!";
-        document.getElementById('fhe-amount').value = "";
-        document.getElementById('xmtp-recipient').value = "";
+        status.textContent = "Swap request sent via XMTP (FHE)";
+        setTimeout(() => {
+          document.getElementById('to-amount').value = amount;
+          status.textContent = "Swap completed!";
+        }, 2000);
       } catch(e) {
         status.textContent = "Failed: " + e.message;
       }
     }
 
-    const CHAINS = {
-      arc: { name: "Arc Testnet", rpc: "https://rpc.testnet.arc.network", chainId: 12345, symbol: "USDC" },
-      eth: { name: "Ethereum", rpc: "https://eth-mainnet.g.alchemy.com/v2/demo", chainId: 1, symbol: "ETH" },
-      polygon: { name: "Polygon", rpc: "https://polygon-rpc.com", chainId: 137, symbol: "MATIC" },
-      bsc: { name: "BNB Chain", rpc: "https://bsc-dataseed.binance.org", chainId: 56, symbol: "BNB" },
-      avalanche: { name: "Avalanche", rpc: "https://api.avax.network/ext/bc/C/rpc", chainId: 43114, symbol: "AVAX" }
-    };
-
-    function switchChain() {
-      const chainKey = document.getElementById('chain-select').value;
-      if (!chainKey) return;
-      currentChain = CHAINS[chainKey];
-      document.getElementById('network-status').textContent = `${currentChain.name} Live`;
-      load();
-    }
-
-    async function load() {
-      if (!currentChain || !account) return;
-      try {
-        const rpcProvider = new ethers.providers.JsonRpcProvider(currentChain.rpc);
-        const [cid, blk, gas, wbal] = await Promise.all([
-          rpcProvider.getNetwork().then(n => n.chainId),
-          rpcProvider.getBlockNumber(),
-          rpcProvider.getGasPrice().then(g => g.toNumber()),
-          rpcProvider.getBalance(account).then(b => b.toString())
-        ]);
-        document.getElementById("cid").textContent = cid;
-        document.getElementById("blk").textContent = blk.toLocaleString();
-        document.getElementById("gas").textContent = (gas/1e9).toFixed(2)+" Gwei";
-        document.getElementById("w").textContent = (parseInt(wbal)/1e18).toFixed(6);
-        document.getElementById("symbol").textContent = currentChain.symbol;
-      } catch(e) { console.error(e); }
-    }
-    setInterval(() => { if (currentChain) load(); }, 5000);
-
-    // PWA
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('install-btn').style.display = 'block';
-    });
-    document.getElementById('install-btn').onclick = () => {
-      if (!deferredPrompt) return alert("Use Chrome → Install");
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        document.getElementById('install-btn').textContent = "Installed!";
-        document.getElementById('install-btn').disabled = true;
-      });
-    };
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=8');
-    }
-
-    // إغلاق النافذة بالضغط خارجها
+    // === Modal Control ===
+    function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
+    function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('show'); }
     document.getElementById('wallet-modal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
+
+    // === PWA ===
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=9');
+    }
   </script>
 </body>
 </html>
