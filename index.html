@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZapFull Enclave</title>
+  <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.json?v=7" />
-  <meta name="theme-color" content="#000000" />
-  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=8" />
+  <meta name="theme-color" content="#8B5CF6" />
+  <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -60,7 +60,6 @@
       margin-top: 8px;
       color: #0F172A;
       letter-spacing: 2px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
     .status {
       background: rgba(139, 92, 246, 0.2);
@@ -125,30 +124,67 @@
       color: #0F172A;
       font-weight: 700;
     }
-    .wallet-btn {
-      background: var(--zap-blue) !important;
-      color: white !important;
-      border: 1px solid rgba(0, 209, 255, 0.5) !important;
-    }
-    .wallet-btn:hover { background: #00E6FF !important; }
-    .fhe-section {
-      background: rgba(236, 72, 153, 0.1);
-      border: 1px solid var(--fhe-color);
-      border-radius: 12px;
-      margin: 12px 0;
-      padding: 16px;
-    }
-    .fhe-title {
-      color: var(--fhe-color);
+
+    /* زر الاتصال الواحد */
+    #connect-btn {
+      background: var(--zap-blue);
+      color: white;
       font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 10px;
+      position: relative;
+    }
+    #connect-btn:hover { background: #00E6FF; }
+
+    /* نافذة اختيار المحفظة */
+    .wallet-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+    .wallet-modal.show { display: flex; }
+    .modal-content {
+      background: #1E293B;
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 360px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+    .modal-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--chok-purple);
+    }
+    .wallet-option {
       display: flex;
       align-items: center;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    .fhe-title::before {
-      content: "Lock";
-      margin-right: 8px;
+    .wallet-option:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--chok-purple);
+    }
+    .wallet-option img {
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+    }
+    .wallet-name {
+      font-weight: 600;
+      color: white;
     }
     .pulse { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
@@ -178,9 +214,7 @@
       <div class="label">Wallet</div>
       <div class="value"><code id="wallet">Not Connected</code></div>
       <div class="value">Balance: <span id="w">-</span> <span id="symbol">—</span></div>
-      <button class="wallet-btn" onclick="connect('metamask')">MetaMask</button>
-      <button class="wallet-btn" onclick="connect('okx')">OKX Wallet</button>
-      <button class="wallet-btn" onclick="connect('phantom')">Phantom</button>
+      <button id="connect-btn" onclick="openWalletModal()">Connect Wallet</button>
     </div>
 
     <!-- قسم FHE + XMTP -->
@@ -199,9 +233,65 @@
     </div>
   </div>
 
+  <!-- نافذة اختيار المحفظة -->
+  <div class="wallet-modal" id="wallet-modal">
+    <div class="modal-content">
+      <div class="modal-title">Choose Wallet</div>
+      <div class="wallet-option" onclick="connectAndClose('metamask')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+        <span class="wallet-name">MetaMask</span>
+      </div>
+      <div class="wallet-option" onclick="connectAndClose('okx')">
+        <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
+        <span class="wallet-name">OKX Wallet</span>
+      </div>
+      <div class="wallet-option" onclick="connectAndClose('phantom')">
+        <img src="https://phantom.app/img/phantom-favicon.png" alt="Phantom">
+        <span class="wallet-name">Phantom</span>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
   <script>
-    // === FHE + XMTP ===
+    // === فتح وإغلاق النافذة ===
+    function openWalletModal() {
+      document.getElementById('wallet-modal').classList.add('show');
+    }
+    function closeWalletModal() {
+      document.getElementById('wallet-modal').classList.remove('show');
+    }
+
+    // === الاتصال + إغلاق النافذة ===
+    async function connectAndClose(wallet) {
+      closeWalletModal();
+      await connect(wallet);
+    }
+
+    // === الاتصال بالمحفظة ===
+    async function connect(wallet) {
+      let ethProvider;
+      if (wallet === 'metamask' && window.ethereum?.isMetaMask) ethProvider = window.ethereum;
+      else if (wallet === 'okx' && window.okxwallet) ethProvider = window.okxwallet;
+      else if (wallet === 'phantom' && window.phantom?.ethereum) ethProvider = window.phantom.ethereum;
+      else return alert(`Please install ${wallet.charAt(0).toUpperCase() + wallet.slice(1)}`);
+
+      try {
+        await ethProvider.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(ethProvider);
+        signer = provider.getSigner();
+        account = await signer.getAddress();
+        document.getElementById('wallet').textContent = account.slice(0,10)+"...";
+        document.getElementById('connect-btn').textContent = "Connected";
+        document.getElementById('connect-btn').disabled = true;
+        await initFHE();
+        await initXMTP();
+        load();
+      } catch(e) { alert(e.message); }
+    }
+
+    // === باقي الكود (FHE, XMTP, Multi-Chain, PWA) ===
+    let provider, signer, account, currentChain = null;
     let xmtpClient, fheInstance;
 
     async function initFHE() {
@@ -241,7 +331,6 @@
       }
     }
 
-    // === Multi-Chain & Wallet ===
     const CHAINS = {
       arc: { name: "Arc Testnet", rpc: "https://rpc.testnet.arc.network", chainId: 12345, symbol: "USDC" },
       eth: { name: "Ethereum", rpc: "https://eth-mainnet.g.alchemy.com/v2/demo", chainId: 1, symbol: "ETH" },
@@ -250,34 +339,12 @@
       avalanche: { name: "Avalanche", rpc: "https://api.avax.network/ext/bc/C/rpc", chainId: 43114, symbol: "AVAX" }
     };
 
-    let provider, signer, account, currentChain = null;
-
     function switchChain() {
       const chainKey = document.getElementById('chain-select').value;
       if (!chainKey) return;
       currentChain = CHAINS[chainKey];
       document.getElementById('network-status').textContent = `${currentChain.name} Live`;
       load();
-    }
-
-    async function connect(wallet) {
-      let ethProvider;
-      if (wallet === 'metamask' && window.ethereum?.isMetaMask) ethProvider = window.ethereum;
-      else if (wallet === 'okx' && window.okxwallet) ethProvider = window.okxwallet;
-      else if (wallet === 'phantom' && window.phantom?.ethereum) ethProvider = window.phantom.ethereum;
-      else return alert(`Install ${wallet}`);
-
-      try {
-        await ethProvider.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(ethProvider);
-        signer = provider.getSigner();
-        account = await signer.getAddress();
-        document.getElementById('wallet').textContent = account.slice(0,10)+"...";
-        document.querySelectorAll('.wallet-btn').forEach(b => b.disabled = true);
-        await initFHE();
-        await initXMTP();
-        load();
-      } catch(e) { alert(e.message); }
     }
 
     async function load() {
@@ -299,7 +366,7 @@
     }
     setInterval(() => { if (currentChain) load(); }, 5000);
 
-    // PWA Install
+    // PWA
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -313,11 +380,16 @@
         document.getElementById('install-btn').textContent = "Installed!";
         document.getElementById('install-btn').disabled = true;
       });
-    ";
+    };
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=7');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=8');
     }
+
+    // إغلاق النافذة بالضغط خارجها
+    document.getElementById('wallet-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
+    });
   </script>
 </body>
 </html>
