@@ -6,7 +6,7 @@
   <title>ZapWallet</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=3" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=4" />
   <meta name="theme-color" content="#00D1FF" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -18,6 +18,7 @@
       --zap-blue: #00D1FF;
       --zap-dark: #0A0A0A;
       --zap-light: #FFFFFF;
+      --arc-badge: #7c3aed;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -119,6 +120,26 @@
       color: white;
       border: 1px solid rgba(0, 209, 255, 0.3);
     }
+    .arc-section {
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid var(--arc-badge);
+      border-radius: 12px;
+      margin: 12px 0;
+      padding: 16px;
+    }
+    .arc-title {
+      color: var(--arc-badge);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .arc-title::before {
+      content: "◆";
+      margin-right: 8px;
+      color: #7c3aed;
+    }
     .pulse { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
@@ -159,15 +180,19 @@
       <div class="value">Gas: <span id="gas">-</span></div>
     </div>
 
-    <div class="card">
-      <div class="label">Smart Contract</div>
-      <div class="value">Address: <code id="contract-addr">-</code></div>
-      <div class="value">Greeting: <span id="greet">-</span></div>
-      <div class="value">Balance: <span id="bal">-</span> <span id="symbol2">—</span></div>
+    <!-- قسم مراقبة العقدة على Arc Testnet (مستقل) -->
+    <div class="arc-section">
+      <div class="arc-title">Arc Testnet Contract Monitor</div>
+      <div class="value">Address: <code>0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697</code></div>
+      <div class="value">Greeting: <span id="arc-greet">Loading...</span></div>
+      <div class="value">Balance: <span id="arc-bal">-</span> USDC</div>
+      <input type="text" id="arc-new-greeting" placeholder="Update greeting on Arc..." />
+      <button onclick="updateArcGreeting()" style="background:#7c3aed;">Update on Arc</button>
+      <div id="arc-tx-status" style="color:#7c3aed; margin-top:8px; font-size:14px;"></div>
     </div>
 
     <div class="card">
-      <div class="label">Update Greeting</div>
+      <div class="label">Update Greeting (Current Chain)</div>
       <input type="text" id="new-greeting" placeholder="Enter new greeting..." />
       <button onclick="updateGreeting()">Send</button>
       <div id="tx-status" style="color:#00D1FF; margin-top:8px; font-size:14px;"></div>
@@ -182,43 +207,19 @@
   <script>
     // === Multi-Chain Config ===
     const CHAINS = {
-      arc: {
-        name: "Arc Testnet",
-        rpc: "https://rpc.testnet.arc.network",
-        chainId: 12345,
-        symbol: "USDC",
-        contract: "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697",
-        abi: [{"inputs":[],"name":"getGreeting","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"type":"string"}],"name":"setGreeting","outputs":[],"stateMutability":"nonpayable","type":"function"}]
-      },
-      eth: {
-        name: "Ethereum",
-        rpc: "https://eth-mainnet.g.alchemy.com/v2/demo",
-        chainId: 1,
-        symbol: "ETH",
-        contract: null
-      },
-      polygon: {
-        name: "Polygon",
-        rpc: "https://polygon-rpc.com",
-        chainId: 137,
-        symbol: "MATIC",
-        contract: null
-      },
-      bsc: {
-        name: "BNB Chain",
-        rpc: "https://bsc-dataseed.binance.org",
-        chainId: 56,
-        symbol: "BNB",
-        contract: null
-      },
-      avalanche: {
-        name: "Avalanche",
-        rpc: "https://api.avax.network/ext/bc/C/rpc",
-        chainId: 43114,
-        symbol: "AVAX",
-        contract: null
-      }
+      arc: { name: "Arc Testnet", rpc: "https://rpc.testnet.arc.network", chainId: 12345, symbol: "USDC", contract: "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697" },
+      eth: { name: "Ethereum", rpc: "https://eth-mainnet.g.alchemy.com/v2/demo", chainId: 1, symbol: "ETH", contract: null },
+      polygon: { name: "Polygon", rpc: "https://polygon-rpc.com", chainId: 137, symbol: "MATIC", contract: null },
+      bsc: { name: "BNB Chain", rpc: "https://bsc-dataseed.binance.org", chainId: 56, symbol: "BNB", contract: null },
+      avalanche: { name: "Avalanche", rpc: "https://api.avax.network/ext/bc/C/rpc", chainId: 43114, symbol: "AVAX", contract: null }
     };
+
+    // Arc Contract (مستقل)
+    const ARC_RPC = "https://rpc.testnet.arc.network";
+    const ARC_CONTRACT = "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697";
+    const ARC_ABI = [{"inputs":[],"name":"getGreeting","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"type":"string"}],"name":"setGreeting","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+    let arcProvider = new ethers.providers.JsonRpcProvider(ARC_RPC);
+    let arcContract = new ethers.Contract(ARC_CONTRACT, ARC_ABI, arcProvider);
 
     let provider, signer, contract, account, currentChain = null;
 
@@ -227,7 +228,6 @@
       if (!chainKey) return;
       currentChain = CHAINS[chainKey];
       document.getElementById('network-status').textContent = `${currentChain.name} Live`;
-      document.getElementById('contract-addr').textContent = currentChain.contract || "N/A";
       load();
     }
 
@@ -244,14 +244,52 @@
         signer = provider.getSigner();
         account = await signer.getAddress();
         if (currentChain?.contract) {
-          contract = new ethers.Contract(currentChain.contract, currentChain.abi, signer);
+          contract = new ethers.Contract(currentChain.contract, ARC_ABI, signer);
         }
         document.getElementById('wallet').textContent = account.slice(0,10)+"...";
         document.querySelectorAll('.wallet-btn').forEach(b => b.disabled = true);
         load();
+        loadArcMonitor(); // تحديث Arc عند الاتصال
       } catch(e) { alert(e.message); }
     }
 
+    // === مراقبة العقدة على Arc (مستقل) ===
+    async function loadArcMonitor() {
+      try {
+        const [greet, bal] = await Promise.all([
+          arcContract.getGreeting(),
+          arcProvider.getBalance(ARC_CONTRACT).then(b => b.toString())
+        ]);
+        document.getElementById("arc-greet").textContent = greet;
+        document.getElementById("arc-bal").textContent = (parseInt(bal)/1e18).toFixed(6);
+      } catch(e) {
+        document.getElementById("arc-greet").textContent = "Error";
+        document.getElementById("arc-bal").textContent = "-";
+      }
+    }
+    setInterval(loadArcMonitor, 8000);
+    loadArcMonitor();
+
+    async function updateArcGreeting() {
+      if (!provider) return alert("Connect wallet first!");
+      const greeting = document.getElementById('arc-new-greeting').value.trim();
+      if (!greeting) return;
+      const status = document.getElementById('arc-tx-status');
+      status.textContent = "Sending...";
+      try {
+        const arcSigner = provider.getSigner();
+        const arcContractWithSigner = new ethers.Contract(ARC_CONTRACT, ARC_ABI, arcSigner);
+        const tx = await arcContractWithSigner.setGreeting(greeting);
+        status.textContent = "Confirming...";
+        await tx.wait();
+        status.textContent = "Success!";
+        document.getElementById('arc-new-greeting').value = "";
+        loadArcMonitor();
+        sendPush();
+      } catch(e) { status.textContent = "Failed: " + e.message; }
+    }
+
+    // === السلسلة الحالية ===
     async function updateGreeting() {
       if (!contract) return alert("No contract on this chain!");
       const greeting = document.getElementById('new-greeting').value.trim();
@@ -265,7 +303,6 @@
         status.textContent = "Success!";
         document.getElementById('new-greeting').value = "";
         load();
-        sendPush();
       } catch(e) { status.textContent = "Failed: " + e.message; }
     }
 
@@ -280,22 +317,11 @@
           account ? rpcProvider.getBalance(account).then(b => b.toString()) : "0"
         ]);
 
-        let greet = "-", bal = "-";
-        if (currentChain.contract && contract) {
-          try {
-            greet = await contract.getGreeting();
-            bal = (await rpcProvider.getBalance(currentChain.contract)).toString();
-          } catch(e) {}
-        }
-
         document.getElementById("cid").textContent = cid;
         document.getElementById("blk").textContent = blk.toLocaleString();
         document.getElementById("gas").textContent = (gas/1e9).toFixed(2)+" Gwei";
-        document.getElementById("greet").textContent = greet;
-        document.getElementById("bal").textContent = bal !== "-" ? (parseInt(bal)/1e18).toFixed(6) : "-";
         document.getElementById("w").textContent = account ? (parseInt(wbal)/1e18).toFixed(6) : "-";
         document.getElementById("symbol").textContent = currentChain.symbol;
-        document.getElementById("symbol2").textContent = currentChain.symbol;
       } catch(e) { console.error(e); }
     }
     setInterval(() => { if (currentChain) load(); }, 5000);
@@ -304,7 +330,7 @@
     if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
     function sendPush() {
       if (Notification.permission === 'granted') {
-        new Notification('ZapWallet', { body: 'Greeting updated!', icon: '/hello-arc-pwa/icons/icon-192.png' });
+        new Notification('ZapWallet', { body: 'Arc greeting updated!', icon: '/hello-arc-pwa/icons/icon-192.png' });
       }
     }
 
@@ -325,7 +351,7 @@
     };
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=3');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=4');
     }
   </script>
 </body>
