@@ -117,6 +117,11 @@
       color: white;
       font-weight: 700;
     }
+    .wallet-btn {
+      background: #1E293B;
+      color: white;
+      border: 1px solid rgba(0, 209, 255, 0.3);
+    }
     .pulse {
       animation: pulse 2s infinite;
     }
@@ -139,7 +144,9 @@
       <div class="label">Wallet</div>
       <div class="value"><code id="wallet">Not Connected</code></div>
       <div class="value">Balance: <span id="w">-</span> USDC</div>
-      <button id="connect-btn">Connect MetaMask</button>
+      <button class="wallet-btn" onclick="connect('metamask')">MetaMask</button>
+      <button class="wallet-btn" onclick="connect('okx')">OKX Wallet</button>
+      <button class="wallet-btn" onclick="connect('phantom')">Phantom</button>
     </div>
 
     <div class="card">
@@ -176,20 +183,29 @@
 
     let provider, signer, contract, account;
 
-    document.getElementById('connect-btn').onclick = async () => {
-      if (!window.ethereum) return alert("MetaMask required!");
+    async function connect(wallet) {
+      let ethProvider;
+      if (wallet === 'metamask' && window.ethereum?.isMetaMask) {
+        ethProvider = window.ethereum;
+      } else if (wallet === 'okx' && window.okxwallet) {
+        ethProvider = window.okxwallet;
+      } else if (wallet === 'phantom' && window.phantom?.ethereum) {
+        ethProvider = window.phantom.ethereum;
+      } else {
+        return alert(`Please install ${wallet === 'okx' ? 'OKX Wallet' : wallet === 'phantom' ? 'Phantom' : 'MetaMask'}`);
+      }
+
       try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await ethProvider.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(ethProvider);
         signer = provider.getSigner();
         account = await signer.getAddress();
         contract = new ethers.Contract(CONTRACT, ABI, signer);
         document.getElementById('wallet').textContent = account.slice(0,10)+"...";
-        document.getElementById('connect-btn').textContent = "Connected";
-        document.getElementById('connect-btn').disabled = true;
+        document.querySelectorAll('.wallet-btn').forEach(b => b.disabled = true);
         load();
       } catch(e) { alert(e.message); }
-    };
+    }
 
     async function updateGreeting() {
       if (!contract) return alert("Connect wallet first!");
