@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=10" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=11" />
   <meta name="theme-color" content="#6D28D9" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -22,152 +22,148 @@
 
   <style>
     :root {
-      --zama-purple: #6D28D9;
-      --arc-blue: #1E40AF;
-      --xmtp-green: #10B981;
-      --bg-dark: #0F172A;
-      --card-bg: #1E293B;
-      --border: #374151;
-      --text: #F1F5F9;
-      --text-muted: #94A3B8;
+      --zama: #6D28D9;
+      --arc: #1E40AF;
+      --xmtp: #10B981;
+      --bg: #0F172A;
+      --card: #1E293B;
+      --border: #334155;
+      --text: #F8FAFC;
+      --muted: #94A3B8;
       --success: #10B981;
-      --warning: #F59E0B;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg-dark);
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Sidebar */
+    /* Mobile-First Layout */
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      padding: 16px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--zama), var(--arc));
+      border-radius: 0 0 20px 20px;
+    }
+    .header img {
+      height: 36px;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: white;
+      letter-spacing: 0.5px;
+    }
+
+    /* Sidebar Toggle */
+    .sidebar-toggle {
+      position: fixed;
+      left: 16px;
+      top: 16px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--border);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+    .sidebar-toggle i { font-size: 18px; color: var(--text); }
+
+    /* Sidebar (Hidden by default on mobile) */
     .sidebar {
+      position: fixed;
+      left: -100px;
+      top: 0; bottom: 0;
       width: 80px;
-      background: rgba(30, 41, 59, 0.95);
+      background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(12px);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 0;
-      position: fixed;
-      left: 0; top: 0; bottom: 0;
-      z-index: 100;
+      padding: 80px 0 20px;
+      transition: 0.3s;
+      z-index: 999;
     }
+    .sidebar.open { left: 0; }
     .sidebar-logo {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 32px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      width: 42px;
+      height: 42px;
+      margin-bottom: 24px;
     }
     .nav-item {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 12px;
       cursor: pointer;
       transition: 0.3s;
-      position: relative;
     }
-    .nav-item:hover {
-      background: rgba(109, 40, 217, 0.2);
-    }
-    .nav-item.active {
-      background: var(--zama-purple);
-      color: white;
-    }
-    .nav-item i {
-      font-size: 20px;
-    }
-    .nav-label {
-      position: absolute;
-      left: 70px;
-      background: var(--zama-purple);
-      color: white;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.3s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    .nav-item:hover .nav-label {
-      opacity: 1;
-      left: 76px;
-    }
+    .nav-item:hover { background: rgba(109, 40, 217, 0.2); }
+    .nav-item.active { background: var(--zama); color: white; }
+    .nav-item i { font-size: 18px; }
 
     /* Main Content */
     .main {
       flex: 1;
-      margin-left: 80px;
-      padding: 20px;
+      padding: 20px 16px;
+      margin-top: 60px;
     }
-    .container {
-      max-width: 440px;
-      margin: 0 auto;
-    }
-
-    /* Header */
-    .header {
-      background: linear-gradient(135deg, var(--zama-purple), var(--arc-blue));
-      padding: 24px 20px;
-      text-align: center;
-      border-radius: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(109, 40, 217, 0.2);
-    }
-    .header img {
-      height: 48px;
-    }
-    .header h1 {
-      font-size: 28px;
-      font-weight: 800;
-      margin-top: 12px;
-      color: white;
-    }
-    .header .tagline {
-      font-size: 13px;
-      color: rgba(255,255,255,0.8);
-      margin-top: 4px;
-    }
+    .container { max-width: 100%; }
 
     /* Swap Card */
     .swap-card {
-      background: var(--card-bg);
+      background: var(--card);
       border-radius: 20px;
-      padding: 24px;
+      padding: 20px;
       border: 1px solid var(--border);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
     .swap-title {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 17px;
+      font-weight: 600;
       color: white;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
     }
-    .swap-title .lock {
-      font-size: 14px;
-      color: #EC4899;
+    .lock-badge {
+      background: #EC4899;
+      color: white;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-weight: 600;
     }
 
     .token-row {
       display: flex;
       align-items: center;
-      background: rgba(30, 41, 59, 0.8);
+      background: rgba(30, 41, 59, 0.7);
       border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       border: 1px solid var(--border);
     }
     .token-row input {
@@ -175,7 +171,7 @@
       background: transparent;
       border: none;
       color: white;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 600;
       text-align: right;
       outline: none;
@@ -185,162 +181,164 @@
       align-items: center;
       cursor: pointer;
     }
-    .token-select img {
-      width: 32px;
-      height: 32px;
-      margin-right: 10px;
+    .token-icon {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
       border-radius: 50%;
     }
     .token-name {
       font-weight: 600;
       color: white;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .swap-arrow {
       text-align: center;
-      margin: 12px 0;
-      font-size: 24px;
-      color: var(--text-muted);
+      margin: 8px 0;
+      font-size: 20px;
+      color: var(--muted);
     }
 
     .swap-btn {
       width: 100%;
-      padding: 18px;
+      padding: 16px;
       border-radius: 16px;
       border: none;
-      background: linear-gradient(90deg, var(--xmtp-green), #34D399);
+      background: linear-gradient(90deg, var(--xmtp), #34D399);
       color: white;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 17px;
       cursor: pointer;
-      margin-top: 16px;
+      margin-top: 12px;
       transition: 0.3s;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
-    .swap-btn:hover { background: linear-gradient(90deg, #059669, var(--xmtp-green)); }
-    .swap-btn:disabled { background: var(--border); cursor: not-allowed; }
+    .swap-btn:hover { transform: translateY(-1px); }
+    .swap-btn:disabled { background: var(--border); }
 
-    .status-bar {
-      background: var(--card-bg);
-      padding: 14px 20px;
+    .status {
+      margin-top: 12px;
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--success);
       text-align: center;
-      border-radius: 16px;
-      margin-top: 16px;
-      border: 1px solid var(--border);
     }
 
     /* Wallet Button */
     #connect-btn {
-      background: var(--arc-blue);
+      background: var(--arc);
       color: white;
-      font-weight: 700;
-      margin: 20px 0;
-      padding: 16px;
+      font-weight: 600;
+      margin: 16px 0;
+      padding: 14px;
       border-radius: 16px;
       text-align: center;
-      font-size: 16px;
+      font-size: 15px;
+      cursor: pointer;
     }
 
     /* Modal */
-    .wallet-modal {
+    .modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.92);
       display: none;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
       z-index: 1000;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
     }
-    .wallet-modal.show { display: flex; }
+    .modal.show { display: flex; }
     .modal-content {
-      background: var(--card-bg);
-      border-radius: 20px;
-      padding: 28px;
-      width: 90%;
-      max-width: 380px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+      width: 100%;
+      max-width: 100%;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
     }
     .modal-title {
       text-align: center;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       color: white;
     }
     .wallet-option {
       display: flex;
       align-items: center;
-      padding: 16px;
-      border-radius: 16px;
-      background: rgba(30, 41, 59, 0.8);
-      margin-bottom: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(30, 41, 59, 0.7);
+      margin-bottom: 10px;
       cursor: pointer;
-      transition: 0.3s;
       border: 1px solid transparent;
     }
     .wallet-option:hover {
       background: rgba(109, 40, 217, 0.3);
-      border-color: var(--zama-purple);
+      border-color: var(--zama);
     }
     .wallet-option img {
-      width: 40px;
-      height: 40px;
-      margin-right: 14px;
+      width: 36px;
+      height: 36px;
+      margin-right: 12px;
     }
     .wallet-name {
       font-weight: 600;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
     }
 
-    .pulse { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    /* Responsive */
+    @media (min-width: 480px) {
+      .sidebar { left: 0; }
+      .sidebar-toggle { display: none; }
+      .main { margin-left: 80px; margin-top: 0; }
+      .modal-content { border-radius: 20px; max-width: 380px; }
+      .modal { align-items: center; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX" class="sidebar-logo">
-    <div class="nav-item active" onclick="showSection('swap')">
-      <i class="fas fa-arrow-right-arrow-left"></i>
-      <div class="nav-label">Swap</div>
-    </div>
-    <div class="nav-item" onclick="showSection('staking')">
-      <i class="fas fa-coins"></i>
-      <div class="nav-label">Staking</div>
-    </div>
-  </div>
+  <div class="app">
 
-  <!-- Main -->
-  <div class="main">
-    <div class="container">
+    <!-- Sidebar Toggle (Mobile) -->
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX" class="sidebar-logo">
+      <div class="nav-item active" onclick="showSection('swap')">
+        <i class="fas fa-arrow-right-arrow-left"></i>
+      </div>
+      <div class="nav-item" onclick="showSection('staking')">
+        <i class="fas fa-coins"></i>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
 
       <!-- Swap Section -->
       <div id="swap-section">
         <div class="header">
           <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
           <h1>ZapDEX</h1>
-          <div class="tagline">FHE-Powered DEX • Arc Testnet</div>
         </div>
-
-        <div class="status-bar pulse">Zama FHE • XMTP • Arc Network</div>
 
         <div class="swap-card">
           <div class="swap-title">
-            Swap
-            <span class="lock">FHE Encrypted</span>
+            <span>Swap</span>
+            <span class="lock-badge">FHE</span>
           </div>
 
           <div class="token-row">
             <input type="number" id="from-amount" placeholder="0.0" />
             <div class="token-select">
-              <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+              <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC" class="token-icon">
               <span class="token-name">USDC</span>
             </div>
           </div>
@@ -350,31 +348,29 @@
           <div class="token-row">
             <input type="number" id="to-amount" placeholder="0.0" disabled />
             <div class="token-select">
-              <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+              <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" class="token-icon">
               <span class="token-name">USDT</span>
             </div>
           </div>
 
           <button class="swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Connect to Swap</button>
-          <div id="swap-status" style="color:var(--success); margin-top:12px; font-size:14px; text-align:center;"></div>
+          <div id="swap-status" class="status"></div>
         </div>
 
-        <button id="connect-btn" onclick="openWalletModal()">Connect Wallet</button>
+        <div id="connect-btn" onclick="openWalletModal()">Connect Wallet</div>
       </div>
 
       <!-- Staking Section -->
       <div id="staking-section" style="display:none;">
         <div class="header">
           <h1>Staking</h1>
-          <div class="tagline">Earn Rewards on Arc</div>
         </div>
-
         <div class="swap-card">
           <div class="swap-title">Stake USDC</div>
-          <input type="number" placeholder="0.0" style="width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); background:rgba(30,41,59,0.8); color:white; margin-bottom:16px;" />
-          <button class="swap-btn" style="background:var(--zama-purple);">Stake Now</button>
-          <div style="margin-top:16px; font-size:14px; color:var(--text-muted);">
-            APY: <strong style="color:var(--xmtp-green);">12.5%</strong> • Locked: 30 days
+          <input type="number" placeholder="0.0" style="width:100%; padding:14px; border-radius:14px; border:1px solid var(--border); background:rgba(30,41,59,0.7); color:white; margin-bottom:14px; font-size:18px;" />
+          <button class="swap-btn" style="background:var(--zama);">Stake</button>
+          <div style="margin-top:12px; font-size:13px; color:var(--muted);">
+            APY: <strong style="color:var(--xmtp);">12.5%</strong>
           </div>
         </div>
       </div>
@@ -383,107 +379,25 @@
   </div>
 
   <!-- Wallet Modal -->
-  <div class="wallet-modal" id="wallet-modal">
+  <div class="modal" id="wallet-modal">
     <div class="modal-content">
       <div class="modal-title">Connect Wallet</div>
       <div class="wallet-option" onclick="connectAndClose('metamask')">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
         <span class="wallet-name">MetaMask</span>
       </div>
-      <div class="wallet-option" onclick="connectAndClose('okx')">
-        <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
-        <span class="wallet-name">OKX Wallet</span>
-      </div>
-      <div class="wallet-option" onclick="connectAndClose('phantom')">
-        <img src="https://phantom.app/img/phantom-favicon.png" alt="Phantom">
-        <span class="wallet-name">Phantom</span>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-  <script>
-    let provider, signer, account, xmtpClient, fheInstance;
-
-    function showSection(section) {
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      document.querySelectorAll('[onclick*="'+section+'"]').forEach(item => item.classList.add('active'));
-      document.getElementById('swap-section').style.display = section === 'swap' ? 'block' : 'none';
-      document.getElementById('staking-section').style.display = section === 'staking' ? 'block' : 'none';
-    }
-
-    async function connectAndClose(wallet) {
-      closeWalletModal();
-      await connect(wallet);
-    }
-
-    async function connect(wallet) {
-      let ethProvider;
-      if (wallet === 'metamask' && window.ethereum?.isMetaMask) ethProvider = window.ethereum;
-      else if (wallet === 'okx' && window.okxwallet) ethProvider = window.okxwallet;
-      else if (wallet === 'phantom' && window.phantom?.ethereum) ethProvider = window.phantom.ethereum;
-      else return alert(`Install ${wallet}`);
-
-      try {
-        await ethProvider.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(ethProvider);
-        signer = provider.getSigner();
-        account = await signer.getAddress();
-        document.getElementById('connect-btn').textContent = account.slice(0,6)+"..."+account.slice(-4);
-        document.getElementById('connect-btn').disabled = true;
-        document.getElementById('swap-btn').disabled = false;
-        document.getElementById('swap-btn').textContent = "Swap";
-        await initFHE();
-        await initXMTP();
-      } catch(e) { alert(e.message); }
-    }
-
-    async function initFHE() {
-      if (!window.fhevm) return;
-      fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 });
-    }
-
-    async function initXMTP() {
-      if (!provider) return;
-      xmtpClient = await XMTP.Client.create(provider.getSigner());
-    }
-
-    async function swapTokens() {
-      if (!account) return;
-      const amount = document.getElementById('from-amount').value;
-      if (!amount || amount <= 0) return;
-
-      const status = document.getElementById('swap-status');
-      status.textContent = "Encrypting with Zama FHE...";
-
-      try {
-        const encrypted = await fheInstance.encrypt32(parseInt(amount * 1e6));
-        const conversation = await xmtpClient.conversations.newConversation("0xZapDEXBot");
-        await conversation.send({
-          type: "fhe_swap",
-          from: "USDC", to: "USDT",
-          encryptedAmount: Array.from(encrypted),
-          wallet: account
-        });
-        status.textContent = "FHE Swap executed via XMTP";
-        setTimeout(() => {
-          document.getElementById('to-amount').value = amount;
-          status.textContent = "Swap completed!";
-        }, 2000);
-      } catch(e) {
-        status.textContent = "Failed: " + e.message;
-      }
-    }
-
-    function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
-    function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('show'); }
-    document.getElementById('wallet-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
-    });
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=10');
-    }
-  </script>
-</body>
-</html>
+      <div class="
+cat > manifest.json << 'EOF'
+{
+  "name": "ZapDEX",
+  "short_name": "ZapDEX",
+  "description": "Private DEX • FHE • Arc Testnet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#6D28D9",
+  "icons": [
+    { "src": "/hello-arc-pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/hello-arc-pwa/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
