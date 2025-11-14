@@ -6,8 +6,8 @@
   <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=11" />
-  <meta name="theme-color" content="#6D28D9" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=12" />
+  <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
@@ -16,16 +16,17 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- XMTP + FHE -->
+  <!-- XMTP + FHE + IPFS -->
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
   <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ipfs-core@0.18.1/dist/index.min.js"></script>
 
   <style>
     :root {
-      --zama: #6D28D9;
-      --arc: #1E40AF;
-      --xmtp: #10B981;
-      --bg: #0F172A;
+      --green: #10B981;
+      --blue: #3B82F6;
+      --yellow: #FBBF24;
+      --dark: #0F172A;
       --card: #1E293B;
       --border: #334155;
       --text: #F8FAFC;
@@ -35,111 +36,93 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
+      background: var(--dark);
       color: var(--text);
       min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
     }
 
-    /* Mobile-First Layout */
-    .app {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
 
     /* Header */
     .header {
       padding: 16px;
       text-align: center;
-      background: linear-gradient(135deg, var(--zama), var(--arc));
-      border-radius: 0 0 20px 20px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
     }
-    .header img {
-      height: 36px;
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
-    }
+    .header img { height: 38px; }
     .header h1 {
-      font-size: 22px;
+      font-size: 23px;
       font-weight: 700;
       margin-top: 8px;
       color: white;
-      letter-spacing: 0.5px;
     }
 
     /* Sidebar Toggle */
     .sidebar-toggle {
       position: fixed;
-      left: 16px;
-      top: 16px;
-      z-index: 1000;
-      background: rgba(30, 41, 59, 0.9);
+      left: 16px; top: 16px; z-index: 1000;
+      background: rgba(30, 41, 59, 0.95);
       border: 1px solid var(--border);
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
+      width: 50px; height: 50px;
+      border-radius: 16px;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: center; justify-content: center;
       cursor: pointer;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .sidebar-toggle i { font-size: 18px; color: var(--text); }
+    .sidebar-toggle i { font-size: 19px; color: var(--text); }
 
-    /* Sidebar (Hidden by default on mobile) */
+    /* Sidebar */
     .sidebar {
       position: fixed;
-      left: -100px;
-      top: 0; bottom: 0;
+      left: -100px; top: 0; bottom: 0;
       width: 80px;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(12px);
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(14px);
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       align-items: center;
       padding: 80px 0 20px;
-      transition: 0.3s;
+      transition: 0.3s ease;
       z-index: 999;
     }
     .sidebar.open { left: 0; }
-    .sidebar-logo {
-      width: 42px;
-      height: 42px;
-      margin-bottom: 24px;
-    }
+    .sidebar-logo { width: 44px; height: 44px; margin-bottom: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     .nav-item {
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
+      width: 52px; height: 52px;
+      border-radius: 16px;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
+      align-items: center; justify-content: center;
+      margin-bottom: 14px;
       cursor: pointer;
       transition: 0.3s;
+      position: relative;
     }
-    .nav-item:hover { background: rgba(109, 40, 217, 0.2); }
-    .nav-item.active { background: var(--zama); color: white; }
-    .nav-item i { font-size: 18px; }
+    .nav-item:hover { background: rgba(251, 191, 36, 0.15); }
+    .nav-item.active {
+      background: var(--yellow);
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .nav-item i { font-size: 19px; }
 
-    /* Main Content */
-    .main {
-      flex: 1;
-      padding: 20px 16px;
-      margin-top: 60px;
-    }
+    /* Main */
+    .main { flex: 1; padding: 20px 16px; margin-top: 60px; }
     .container { max-width: 100%; }
 
-    /* Swap Card */
-    .swap-card {
+    /* Cards */
+    .card {
       background: var(--card);
       border-radius: 20px;
       padding: 20px;
       border: 1px solid var(--border);
       box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin-bottom: 16px;
     }
-    .swap-title {
+    .card-title {
       font-size: 17px;
       font-weight: 600;
       color: white;
@@ -148,18 +131,18 @@
       justify-content: space-between;
       align-items: center;
     }
-    .lock-badge {
-      background: #EC4899;
-      color: white;
+    .badge {
+      background: var(--yellow);
+      color: #0F172A;
       font-size: 11px;
       padding: 4px 8px;
       border-radius: 8px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
+    /* Swap */
     .token-row {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       background: rgba(30, 41, 59, 0.7);
       border-radius: 16px;
       padding: 12px 14px;
@@ -167,129 +150,72 @@
       border: 1px solid var(--border);
     }
     .token-row input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: white;
-      font-size: 20px;
-      font-weight: 600;
-      text-align: right;
-      outline: none;
+      flex: 1; background: transparent; border: none;
+      color: white; font-size: 20px; font-weight: 600;
+      text-align: right; outline: none;
     }
-    .token-select {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-    .token-icon {
-      width: 28px;
-      height: 28px;
-      margin-right: 8px;
-      border-radius: 50%;
-    }
-    .token-name {
-      font-weight: 600;
-      color: white;
-      font-size: 14px;
-    }
+    .token-icon { width: 28px; height: 28px; margin-right: 8px; border-radius: 50%; }
+    .token-name { font-weight: 600; color: white; font-size: 14px; }
 
-    .swap-arrow {
-      text-align: center;
-      margin: 8px 0;
-      font-size: 20px;
-      color: var(--muted);
-    }
+    .swap-arrow { text-align: center; margin: 8px 0; font-size: 20px; color: var(--muted); }
 
-    .swap-btn {
-      width: 100%;
-      padding: 16px;
-      border-radius: 16px;
-      border: none;
-      background: linear-gradient(90deg, var(--xmtp), #34D399);
-      color: white;
-      font-weight: 700;
-      font-size: 17px;
-      cursor: pointer;
-      margin-top: 12px;
+    .btn {
+      width: 100%; padding: 16px;
+      border-radius: 16px; border: none;
+      font-weight: 700; font-size: 17px;
+      cursor: pointer; margin-top: 12px;
       transition: 0.3s;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
-    .swap-btn:hover { transform: translateY(-1px); }
+    .swap-btn { background: linear-gradient(90deg, var(--green), #34D399); color: white; }
+    .swap-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); }
     .swap-btn:disabled { background: var(--border); }
 
-    .status {
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--success);
-      text-align: center;
+    /* Messages Section */
+    .file-input {
+      width: 100%; padding: 14px;
+      border-radius: 14px; border: 1px dashed var(--yellow);
+      background: rgba(251, 191, 36, 0.05);
+      color: var(--text); font-size: 14px;
+      text-align: center; margin-bottom: 12px;
+      cursor: pointer;
     }
+    .msg-input {
+      width: 100%; padding: 14px;
+      border-radius: 14px; border: 1px solid var(--border);
+      background: rgba(30, 41, 59, 0.7); color: white;
+      font-size: 15px; margin-bottom: 12px;
+    }
+    .send-btn {
+      background: var(--blue); color: white;
+    }
+    .send-btn:hover { background: #2563EB; }
 
-    /* Wallet Button */
+    .status { margin-top: 12px; font-size: 13px; color: var(--success); text-align: center; }
+
+    /* Wallet */
     #connect-btn {
-      background: var(--arc);
-      color: white;
-      font-weight: 600;
-      margin: 16px 0;
-      padding: 14px;
-      border-radius: 16px;
-      text-align: center;
-      font-size: 15px;
+      background: var(--blue); color: white;
+      font-weight: 600; padding: 14px;
+      border-radius: 16px; text-align: center;
+      font-size: 15px; margin: 16px 0;
       cursor: pointer;
     }
 
     /* Modal */
     .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.92);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.94); display: none;
+      align-items: flex-end; justify-content: center;
+      z-index: 1000; backdrop-filter: blur(12px);
     }
     .modal.show { display: flex; }
     .modal-content {
-      background: var(--card);
-      border-radius: 20px 20px 0 0;
-      padding: 24px;
-      width: 100%;
-      max-width: 100%;
+      background: var(--card); border-radius: 20px 20px 0 0;
+      padding: 24px; width: 100%; max-width: 100%;
       box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
     }
-    .modal-title {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: white;
-    }
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(30, 41, 59, 0.7);
-      margin-bottom: 10px;
-      cursor: pointer;
-      border: 1px solid transparent;
-    }
-    .wallet-option:hover {
-      background: rgba(109, 40, 217, 0.3);
-      border-color: var(--zama);
-    }
-    .wallet-option img {
-      width: 36px;
-      height: 36px;
-      margin-right: 12px;
-    }
-    .wallet-name {
-      font-weight: 600;
-      color: white;
-      font-size: 15px;
-    }
+    .modal-title { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 16px; color: white; }
 
-    /* Responsive */
     @media (min-width: 480px) {
       .sidebar { left: 0; }
       .sidebar-toggle { display: none; }
@@ -303,7 +229,7 @@
 
   <div class="app">
 
-    <!-- Sidebar Toggle (Mobile) -->
+    <!-- Sidebar Toggle -->
     <div class="sidebar-toggle" onclick="toggleSidebar()">
       <i class="fas fa-bars"></i>
     </div>
@@ -314,6 +240,9 @@
       <div class="nav-item active" onclick="showSection('swap')">
         <i class="fas fa-arrow-right-arrow-left"></i>
       </div>
+      <div class="nav-item" onclick="showSection('messages')">
+        <i class="fas fa-envelope"></i>
+      </div>
       <div class="nav-item" onclick="showSection('staking')">
         <i class="fas fa-coins"></i>
       </div>
@@ -322,80 +251,34 @@
     <!-- Main -->
     <div class="main">
 
-      <!-- Swap Section -->
+      <!-- Swap -->
       <div id="swap-section">
         <div class="header">
           <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
           <h1>ZapDEX</h1>
         </div>
 
-        <div class="swap-card">
-          <div class="swap-title">
-            <span>Swap</span>
-            <span class="lock-badge">FHE</span>
-          </div>
-
+        <div class="card">
+          <div class="card-title">Swap <span class="badge">FHE</span></div>
           <div class="token-row">
             <input type="number" id="from-amount" placeholder="0.0" />
             <div class="token-select">
-              <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC" class="token-icon">
+              <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon">
               <span class="token-name">USDC</span>
             </div>
           </div>
-
           <div class="swap-arrow">Down Arrow</div>
-
           <div class="token-row">
-            <input type="number" id="to-amount" placeholder="0.0" disabled />
-            <div class="token-select">
-              <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" class="token-icon">
-              <span class="token-name">USDT</span>
-            </div>
-          </div>
-
-          <button class="swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Connect to Swap</button>
-          <div id="swap-status" class="status"></div>
-        </div>
-
-        <div id="connect-btn" onclick="openWalletModal()">Connect Wallet</div>
-      </div>
-
-      <!-- Staking Section -->
-      <div id="staking-section" style="display:none;">
-        <div class="header">
-          <h1>Staking</h1>
-        </div>
-        <div class="swap-card">
-          <div class="swap-title">Stake USDC</div>
-          <input type="number" placeholder="0.0" style="width:100%; padding:14px; border-radius:14px; border:1px solid var(--border); background:rgba(30,41,59,0.7); color:white; margin-bottom:14px; font-size:18px;" />
-          <button class="swap-btn" style="background:var(--zama);">Stake</button>
-          <div style="margin-top:12px; font-size:13px; color:var(--muted);">
-            APY: <strong style="color:var(--xmtp);">12.5%</strong>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Wallet Modal -->
-  <div class="modal" id="wallet-modal">
-    <div class="modal-content">
-      <div class="modal-title">Connect Wallet</div>
-      <div class="wallet-option" onclick="connectAndClose('metamask')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-        <span class="wallet-name">MetaMask</span>
-      </div>
-      <div class="
+            <input type="number" id="to-amount" placeholder="0.0
 cat > manifest.json << 'EOF'
 {
   "name": "ZapDEX",
   "short_name": "ZapDEX",
-  "description": "Private DEX • FHE • Arc Testnet",
+  "description": "Private DeFi + Encrypted Chat + IPFS",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0F172A",
-  "theme_color": "#6D28D9",
+  "theme_color": "#10B981",
   "icons": [
     { "src": "/hello-arc-pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/hello-arc-pwa/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
