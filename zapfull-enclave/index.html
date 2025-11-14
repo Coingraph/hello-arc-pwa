@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZapChok</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=7" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- XMTP + FHE -->
+  <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
+  <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
+
+  <style>
+    :root {
+      --zap-yellow: #FFD60A;
+      --zap-green: #10B981;
+      --zap-blue: #00D1FF;
+      --zap-dark: #0F172A;
+      --zap-light: #F8FAFC;
+      --fhe-color: #EC4899;
+      --chok-purple: #8B5CF6;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      color: var(--zap-light);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .header {
+      background: linear-gradient(90deg, var(--zap-yellow), var(--chok-purple));
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      height: 50px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: #0F172A;
+      letter-spacing: 2px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .status {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--chok-purple);
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .card {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .card:last-child { border: none; }
+    .label {
+      font-size: 14px;
+      color: #CBD5E1;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .value {
+      font-size: 18px;
+      color: white;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .value code {
+      background: rgba(255, 214, 10, 0.15);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--zap-yellow);
+    }
+    select, input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      font-size: 16px;
+      margin: 12px 0;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--zap-yellow);
+      color: #0F172A;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin: 8px 0;
+    }
+    button:hover { background: #FFE066; }
+    button:disabled { background: #475569; cursor: not-allowed; }
+    #install-btn {
+      background: linear-gradient(90deg, var(--zap-yellow), var(--chok-purple));
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .wallet-btn {
+      background: var(--zap-blue) !important;
+      color: white !important;
+      border: 1px solid rgba(0, 209, 255, 0.5) !important;
+    }
+    .wallet-btn:hover { background: #00E6FF !important; }
+    .fhe-section {
+      background: rgba(236, 72, 153, 0.1);
+      border: 1px solid var(--fhe-color);
+      border-radius: 12px;
+      margin: 12px 0;
+      padding: 16px;
+    }
+    .fhe-title {
+      color: var(--fhe-color);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .fhe-title::before {
+      content: "Lock";
+      margin-right: 8px;
+    }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapChok">
+      <h1>ZapChok</h1>
+    </div>
+    <div class="status pulse" id="network-status">Select Network</div>
+
+    <div class="card">
+      <div class="label">Select Network</div>
+      <select id="chain-select" onchange="switchChain()">
+        <option value="">Choose...</option>
+        <option value="arc">Arc Testnet</option>
+        <option value="eth">Ethereum Mainnet</option>
+        <option value="polygon">Polygon</option>
+        <option value="bsc">BNB Chain</option>
+        <option value="avalanche">Avalanche</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="label">Wallet</div>
+      <div class="value"><code id="wallet">Not Connected</code></div>
+      <div class="value">Balance: <span id="w">-</span> <span id="symbol">—</span></div>
+      <button class="wallet-btn" onclick="connect('metamask')">MetaMask</button>
+      <button class="wallet-btn" onclick="connect('okx')">OKX Wallet</button>
+      <button class="wallet-btn" onclick="connect('phantom')">Phantom</button>
+    </div>
+
+    <!-- قسم FHE + XMTP -->
+    <div class="fhe-section">
+      <div class="fhe-title">Private Transfer (FHE + XMTP)</div>
+      <div class="value">Recipient (XMTP Address):</div>
+      <input type="text" id="xmtp-recipient" placeholder="0x..." />
+      <div class="value">Amount (USDC):</div>
+      <input type="number" id="fhe-amount" placeholder="0.0" step="0.000001" />
+      <button onclick="sendPrivateTransfer()" style="background:#EC4899;">Send Encrypted</button>
+      <div id="fhe-status" style="color:#EC4899; margin-top:8px; font-size:14px;"></div>
+    </div>
+
+    <div class="card">
+      <button id="install-btn">Install App</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  <script>
+    // === FHE + XMTP ===
+    let xmtpClient, fheInstance;
+
+    async function initFHE() {
+      if (!window.fhevm) return;
+      fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 });
+    }
+
+    async function initXMTP() {
+      if (!provider) return;
+      const signer = provider.getSigner();
+      xmtpClient = await XMTP.Client.create(signer);
+    }
+
+    async function sendPrivateTransfer() {
+      if (!provider || !currentChain) return alert("Connect wallet & select network!");
+      const recipient = document.getElementById('xmtp-recipient').value.trim();
+      const amount = document.getElementById('fhe-amount').value;
+      if (!recipient || !amount || amount <= 0) return alert("Fill all fields!");
+
+      const status = document.getElementById('fhe-status');
+      status.textContent = "Encrypting...";
+
+      try {
+        const encryptedAmount = await fheInstance.encrypt32(parseInt(amount * 1e6));
+        const conversation = await xmtpClient.conversations.newConversation(recipient);
+        await conversation.send({
+          type: "private_transfer",
+          encryptedAmount: Array.from(encryptedAmount),
+          chain: currentChain.name,
+          symbol: currentChain.symbol
+        });
+        status.textContent = "Sent privately via XMTP!";
+        document.getElementById('fhe-amount').value = "";
+        document.getElementById('xmtp-recipient').value = "";
+      } catch(e) {
+        status.textContent = "Failed: " + e.message;
+      }
+    }
+
+    // === Multi-Chain & Wallet ===
+    const CHAINS = {
+      arc: { name: "Arc Testnet", rpc: "https://rpc.testnet.arc.network", chainId: 12345, symbol: "USDC" },
+      eth: { name: "Ethereum", rpc: "https://eth-mainnet.g.alchemy.com/v2/demo", chainId: 1, symbol: "ETH" },
+      polygon: { name: "Polygon", rpc: "https://polygon-rpc.com", chainId: 137, symbol: "MATIC" },
+      bsc: { name: "BNB Chain", rpc: "https://bsc-dataseed.binance.org", chainId: 56, symbol: "BNB" },
+      avalanche: { name: "Avalanche", rpc: "https://api.avax.network/ext/bc/C/rpc", chainId: 43114, symbol: "AVAX" }
+    };
+
+    let provider, signer, account, currentChain = null;
+
+    function switchChain() {
+      const chainKey = document.getElementById('chain-select').value;
+      if (!chainKey) return;
+      currentChain = CHAINS[chainKey];
+      document.getElementById('network-status').textContent = `${currentChain.name} Live`;
+      load();
+    }
+
+    async function connect(wallet) {
+      let ethProvider;
+      if (wallet === 'metamask' && window.ethereum?.isMetaMask) ethProvider = window.ethereum;
+      else if (wallet === 'okx' && window.okxwallet) ethProvider = window.okxwallet;
+      else if (wallet === 'phantom' && window.phantom?.ethereum) ethProvider = window.phantom.ethereum;
+      else return alert(`Install ${wallet}`);
+
+      try {
+        await ethProvider.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(ethProvider);
+        signer = provider.getSigner();
+        account = await signer.getAddress();
+        document.getElementById('wallet').textContent = account.slice(0,10)+"...";
+        document.querySelectorAll('.wallet-btn').forEach(b => b.disabled = true);
+        await initFHE();
+        await initXMTP();
+        load();
+      } catch(e) { alert(e.message); }
+    }
+
+    async function load() {
+      if (!currentChain || !account) return;
+      try {
+        const rpcProvider = new ethers.providers.JsonRpcProvider(currentChain.rpc);
+        const [cid, blk, gas, wbal] = await Promise.all([
+          rpcProvider.getNetwork().then(n => n.chainId),
+          rpcProvider.getBlockNumber(),
+          rpcProvider.getGasPrice().then(g => g.toNumber()),
+          rpcProvider.getBalance(account).then(b => b.toString())
+        ]);
+        document.getElementById("cid").textContent = cid;
+        document.getElementById("blk").textContent = blk.toLocaleString();
+        document.getElementById("gas").textContent = (gas/1e9).toFixed(2)+" Gwei";
+        document.getElementById("w").textContent = (parseInt(wbal)/1e18).toFixed(6);
+        document.getElementById("symbol").textContent = currentChain.symbol;
+      } catch(e) { console.error(e); }
+    }
+    setInterval(() => { if (currentChain) load(); }, 5000);
+
+    // PWA Install
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('install-btn').style.display = 'block';
+    });
+    document.getElementById('install-btn').onclick = () => {
+      if (!deferredPrompt) return alert("Use Chrome → Install");
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        document.getElementById('install-btn').textContent = "Installed!";
+        document.getElementById('install-btn').disabled = true;
+      });
+    ";
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=7');
+    }
+  </script>
+</body>
+</html>
