@@ -1,11 +1,11 @@
 {
-  "name": "Arc Testnet Monitor",
-  "short_name": "Arc Monitor",
-  "description": "مراقبة عقدك الذكي على Arc Testnet",
+  "name": "Arc Monitor",
+  "short_name": "Arc",
+  "description": "Official Arc Testnet Monitor",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#38bdf8",
+  "background_color": "#0A0A0A",
+  "theme_color": "#00D1FF",
   "icons": [
     {
       "src": "/hello-arc-pwa/icons/icon-192.png",

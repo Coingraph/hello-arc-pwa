@@ -3,59 +3,169 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arc Testnet Monitor</title>
+  <title>Arc Monitor</title>
 
   <!-- PWA -->
   <link rel="manifest" href="/hello-arc-pwa/manifest.json" />
-  <meta name="theme-color" content="#38bdf8" />
+  <meta name="theme-color" content="#00D1FF" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: Tahoma; background: #0f172a; color: #e2e8f0; padding: 20px; margin: 0; }
-    .c { max-width: 700px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; }
-    h1 { color: #38bdf8; text-align: center; margin: 0 0 20px; }
-    .card { background: #334155; padding: 14px; border-radius: 10px; margin: 12px 0; }
-    .l { color: #94a3b8; font-weight: bold; }
-    .v { color: #fff; }
-    code { background: #1e40af; padding: 2px 6px; border-radius: 4px; }
-    input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
-    button { background: #38bdf8; color: #0f172a; font-weight: bold; cursor: pointer; }
-    #install-btn { background: #10b981; display: block !important; }
+    :root {
+      --arc-blue: #00D1FF;
+      --arc-dark: #0A0A0A;
+      --arc-light: #FFFFFF;
+      --card-bg: #1A1A1A;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0A0A0A 0%, #001122 100%);
+      color: var(--arc-light);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: rgba(26, 26, 26, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 209, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 209, 255, 0.2);
+    }
+    .header {
+      background: linear-gradient(90deg, #00D1FF, #0099CC);
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .header img {
+      height: 50px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: white;
+    }
+    .status {
+      background: rgba(0, 209, 255, 0.1);
+      color: var(--arc-blue);
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      border-bottom: 1px solid rgba(0, 209, 255, 0.2);
+    }
+    .card {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .card:last-child { border: none; }
+    .label {
+      font-size: 14px;
+      color: #94A3B8;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .value {
+      font-size: 18px;
+      color: white;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .value code {
+      background: rgba(0, 209, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--arc-blue);
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 209, 255, 0.3);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      font-size: 16px;
+      margin: 12px 0;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--arc-blue);
+      color: var(--arc-dark);
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin: 8px 0;
+    }
+    button:hover { background: #00E6FF; }
+    button:disabled { background: #334155; cursor: not-allowed; }
+    #install-btn {
+      background: linear-gradient(90deg, #00D1FF, #0099CC);
+      color: white;
+      font-weight: 700;
+    }
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
-  <div class="c">
-    <h1>Arc Testnet Monitor</h1>
+  <div class="container">
+    <div class="header">
+      <img src="https://arc.network/logo.png" alt="Arc Network" onerror="this.src='https://i.imgur.com/2rG5n8E.png'">
+      <h1>Arc Monitor</h1>
+    </div>
+    <div class="status pulse">Testnet Live</div>
 
     <div class="card">
-      <div class="l">المحفظة</div>
-      <div class="v"><code id="wallet">غير متصل</code></div>
-      <div class="v">الرصيد: <span id="w">-</span> USDC</div>
+      <div class="label">المحفظة</div>
+      <div class="value"><code id="wallet">غير متصل</code></div>
+      <div class="value">الرصيد: <span id="w">-</span> USDC</div>
       <button id="connect-btn">ربط MetaMask</button>
     </div>
 
     <div class="card">
-      <div class="l">العقدة</div>
-      <div class="v">Chain ID: <span id="cid">-</span></div>
-      <div class="v">Block: <span id="blk">-</span></div>
-      <div class="v">Gas: <span id="gas">-</span></div>
+      <div class="label">العقدة</div>
+      <div class="value">Chain ID: <span id="cid">-</span></div>
+      <div class="value">Block: <span id="blk">-</span></div>
+      <div class="value">Gas: <span id="gas">-</span></div>
     </div>
 
     <div class="card">
-      <div class="l">العقد الذكي</div>
-      <div class="v">عنوان: <code>0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697</code></div>
-      <div class="v">التحية: <span id="greet">-</span></div>
-      <div class="v">الرصيد: <span id="bal">-</span> USDC</div>
+      <div class="label">العقد الذكي</div>
+      <div class="value">عنوان: <code>0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697</code></div>
+      <div class="value">التحية: <span id="greet">-</span></div>
+      <div class="value">الرصيد: <span id="bal">-</span> USDC</div>
     </div>
 
     <div class="card">
-      <div class="l">تحديث التحية</div>
+      <div class="label">تحديث التحية</div>
       <input type="text" id="new-greeting" placeholder="أدخل تحية جديدة..." />
       <button onclick="updateGreeting()">إرسال</button>
-      <div id="tx-status"></div>
+      <div id="tx-status" style="color:#00D1FF; margin-top:8px; font-size:14px;"></div>
     </div>
 
-    <button id="install-btn">تثبيت التطبيق (PWA)</button>
+    <div class="card">
+      <button id="install-btn">تثبيت التطبيق</button>
+    </div>
   </div>
 
   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
@@ -67,14 +177,14 @@
     let provider, signer, contract, account;
 
     document.getElementById('connect-btn').onclick = async () => {
-      if (!window.ethereum) return alert("قم بتثبيت MetaMask!");
+      if (!window.ethereum) return alert("MetaMask required!");
       try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(window.ethereum);
         signer = provider.getSigner();
         account = await signer.getAddress();
         contract = new ethers.Contract(CONTRACT, ABI, signer);
-        document.getElementById('wallet').textContent = account;
+        document.getElementById('wallet').textContent = account.slice(0,10)+"...";
         document.getElementById('connect-btn').textContent = "متصل";
         document.getElementById('connect-btn').disabled = true;
         load();
@@ -82,20 +192,20 @@
     };
 
     async function updateGreeting() {
-      if (!contract) return alert("اربط MetaMask!");
+      if (!contract) return alert("Connect wallet first!");
       const greeting = document.getElementById('new-greeting').value.trim();
       if (!greeting) return;
       const status = document.getElementById('tx-status');
-      status.textContent = "جاري...";
+      status.textContent = "Sending...";
       try {
         const tx = await contract.setGreeting(greeting);
-        status.textContent = "في انتظار التأكيد...";
+        status.textContent = "Confirming...";
         await tx.wait();
-        status.textContent = "تم!";
+        status.textContent = "Success!";
         document.getElementById('new-greeting').value = "";
         load();
         sendPush();
-      } catch(e) { status.textContent = "فشل: " + e.message; }
+      } catch(e) { status.textContent = "Failed: " + e.message; }
     }
 
     async function load() {
@@ -118,13 +228,13 @@
     }
     setInterval(load, 5000); load();
 
-    // إشعارات
+    // Notifications
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
     function sendPush() {
       if (Notification.permission === 'granted') {
-        new Notification('تحية جديدة!', { body: document.getElementById('greet').textContent, icon: '/hello-arc-pwa/icons/icon-192.png' });
+        new Notification('Arc Update!', { body: document.getElementById('greet').textContent, icon: '/hello-arc-pwa/icons/icon-192.png' });
       }
     }
 
@@ -136,13 +246,10 @@
       document.getElementById('install-btn').style.display = 'block';
     });
     document.getElementById('install-btn').onclick = () => {
-      if (!deferredPrompt) {
-        alert("افتح في Chrome → النقاط الثلاث → تثبيت");
-        return;
-      }
+      if (!deferredPrompt) return alert("Use Chrome menu → Install");
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(() => {
-        document.getElementById('install-btn').textContent = "تم التثبيت!";
+        document.getElementById('install-btn').textContent = "Installed!";
         document.getElementById('install-btn').disabled = true;
       });
     };
