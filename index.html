@@ -6,12 +6,12 @@
   <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=15" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=16" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -42,27 +42,32 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar - Sticky */
+    /* Top Bar - Motion Center Logo */
     .topbar {
-      position: sticky;
-      top: 0;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 70px;
       background: rgba(15, 23, 42, 0.98);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0 16px;
       z-index: 1000;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .topbar.hidden {
+      transform: translateY(-100%);
     }
     .topbar.scrolled {
-      padding: 10px 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      height: 60px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     }
 
-    .topbar-left {
-      display: flex; align-items: center; gap: 12px;
+    /* Side Buttons */
+    .topbar-left, .topbar-right {
+      display: flex; align-items: center; gap: 10px;
     }
     .topbar-btn {
       width: 44px; height: 44px;
@@ -70,7 +75,7 @@
       display: flex;
       align-items: center; justify-content: center;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s ease;
       font-size: 17px;
       color: var(--text);
     }
@@ -78,20 +83,41 @@
       background: var(--yellow);
       color: #0F172A;
       font-weight: 700;
+      transform: scale(1.05);
     }
     .topbar-btn:hover { background: rgba(251, 191, 36, 0.15); }
 
-    .logo {
+    /* Center Logo - Motion */
+    .logo-center {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
       display: flex; align-items: center; gap: 8px;
-      font-size: 20px; font-weight: 700; color: white;
-      transition: transform 0.3s ease;
+      font-size: 22px; font-weight: 800; color: white;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
     }
-    .logo img { height: 34px; transition: transform 0.3s ease; }
-    .topbar.scrolled .logo { transform: scale(0.9); }
+    .topbar.show-logo .logo-center {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .topbar.scrolled .logo-center {
+      font-size: 18px;
+      gap: 6px;
+    }
+    .logo-center img {
+      height: 36px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .topbar.scrolled .logo-center img {
+      height: 30px;
+    }
 
-    /* Main - Full Scroll */
+    /* Main */
     .main {
-      padding: 20px 16px 100px;
+      padding: 90px 16px 120px;
       min-height: 100vh;
     }
 
@@ -182,7 +208,7 @@
     }
     .modal-title { text-align: center; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: white; }
 
-    /* Extra Content to Scroll */
+    /* Extra Content */
     .extra-content {
       padding: 20px 16px;
       background: var(--card);
@@ -194,7 +220,7 @@
     .extra-content p { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
     @media (min-width: 480px) {
-      .topbar { padding: 14px 20px; }
+      .topbar { padding: 0 20px; }
       .modal-content { border-radius: 20px; max-width: 380px; }
       .modal { align-items: center; }
     }
@@ -202,7 +228,7 @@
 </head>
 <body>
 
-  <!-- Top Bar - Sticky + Animated -->
+  <!-- Top Bar - Motion Center Logo -->
   <div class="topbar" id="topbar">
     <div class="topbar-left">
       <div class="topbar-btn active" id="btn-swap" onclick="showSection('swap')">
@@ -211,17 +237,22 @@
       <div class="topbar-btn" id="btn-messages" onclick="showSection('messages')">
         <i class="fas fa-envelope"></i>
       </div>
+    </div>
+
+    <!-- Center Logo with Motion -->
+    <div class="logo-center" id="logo-center">
+      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
+      <span>ZapDEX</span>
+    </div>
+
+    <div class="topbar-right">
       <div class="topbar-btn" id="btn-staking" onclick="showSection('staking')">
         <i class="fas fa-coins"></i>
       </div>
     </div>
-    <div class="logo">
-      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
-      <span>ZapDEX</span>
-    </div>
   </div>
 
-  <!-- Main - Full Scroll -->
+  <!-- Main -->
   <div class="main">
 
     <!-- Swap -->
@@ -309,15 +340,27 @@
 
   <script>
     let provider, account, xmtpClient, fheInstance, w3;
+    let lastScroll = 0;
 
-    // Sticky Top Bar Animation
+    // Motion Logo + Hide/Show
     window.addEventListener('scroll', () => {
       const topbar = document.getElementById('topbar');
-      if (window.scrollY > 20) {
-        topbar.classList.add('scrolled');
-      } else {
-        topbar.classList.remove('scrolled');
+      const logo = document.getElementById('logo-center');
+      const currentScroll = window.scrollY;
+
+      if (currentScroll > lastScroll && currentScroll > 100) {
+        topbar.classList.add('hidden');
+      } else if (currentScroll < lastScroll) {
+        topbar.classList.remove('hidden');
       }
+
+      if (currentScroll > 50) {
+        topbar.classList.add('scrolled', 'show-logo');
+      } else {
+        topbar.classList.remove('scrolled', 'show-logo');
+      }
+
+      lastScroll = currentScroll;
     });
 
     function showSection(section) {
@@ -330,7 +373,7 @@
 
     async function connectWallet(name) {
       let eth = window.ethereum;
-      if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
+      if (1 === 'okx' && window.okxwallet) eth = window.okxwallet;
       if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
       if (!eth) return alert(`Install ${name}`);
 
@@ -401,7 +444,7 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=15');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=16');
     }
   </script>
 </body>
