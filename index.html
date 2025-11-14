@@ -6,7 +6,7 @@
   <title>ZapDEX</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=14" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=15" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -34,7 +34,7 @@
       --muted: #94A3B8;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; overflow-x: hidden; }
+    html, body { height: auto; min-height: 100vh; overflow-x: hidden; }
     body {
       font-family: 'Inter', sans-serif;
       background: var(--dark);
@@ -42,10 +42,10 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar */
+    /* Top Bar - Sticky */
     .topbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      position: sticky;
+      top: 0;
       background: rgba(15, 23, 42, 0.98);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
@@ -54,7 +54,13 @@
       align-items: center;
       justify-content: space-between;
       z-index: 1000;
+      transition: all 0.3s ease;
     }
+    .topbar.scrolled {
+      padding: 10px 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
     .topbar-left {
       display: flex; align-items: center; gap: 12px;
     }
@@ -78,12 +84,14 @@
     .logo {
       display: flex; align-items: center; gap: 8px;
       font-size: 20px; font-weight: 700; color: white;
+      transition: transform 0.3s ease;
     }
-    .logo img { height: 34px; }
+    .logo img { height: 34px; transition: transform 0.3s ease; }
+    .topbar.scrolled .logo { transform: scale(0.9); }
 
-    /* Main */
+    /* Main - Full Scroll */
     .main {
-      padding: 76px 16px 20px;
+      padding: 20px 16px 100px;
       min-height: 100vh;
     }
 
@@ -174,6 +182,17 @@
     }
     .modal-title { text-align: center; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: white; }
 
+    /* Extra Content to Scroll */
+    .extra-content {
+      padding: 20px 16px;
+      background: var(--card);
+      border-radius: 18px;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+    }
+    .extra-content h3 { font-size: 15px; margin-bottom: 8px; color: var(--yellow); }
+    .extra-content p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
     @media (min-width: 480px) {
       .topbar { padding: 14px 20px; }
       .modal-content { border-radius: 20px; max-width: 380px; }
@@ -183,8 +202,8 @@
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <div class="topbar">
+  <!-- Top Bar - Sticky + Animated -->
+  <div class="topbar" id="topbar">
     <div class="topbar-left">
       <div class="topbar-btn active" id="btn-swap" onclick="showSection('swap')">
         <i class="fas fa-arrow-right-arrow-left"></i>
@@ -202,7 +221,7 @@
     </div>
   </div>
 
-  <!-- Main -->
+  <!-- Main - Full Scroll -->
   <div class="main">
 
     <!-- Swap -->
@@ -253,6 +272,20 @@
       </div>
     </div>
 
+    <!-- Extra Scrollable Content -->
+    <div class="extra-content">
+      <h3>Privacy First</h3>
+      <p>All swaps are FHE-encrypted. Messages are sent via XMTP. Files stored on IPFS.</p>
+    </div>
+    <div class="extra-content">
+      <h3>Arc Testnet</h3>
+      <p>Connected to Arc Network. Test USDC ↔ USDT swaps with full privacy.</p>
+    </div>
+    <div class="extra-content">
+      <h3>Zama + XMTP</h3>
+      <p>Powered by Zama FHE and XMTP for confidential DeFi and messaging.</p>
+    </div>
+
   </div>
 
   <!-- Wallet Modal -->
@@ -276,6 +309,16 @@
 
   <script>
     let provider, account, xmtpClient, fheInstance, w3;
+
+    // Sticky Top Bar Animation
+    window.addEventListener('scroll', () => {
+      const topbar = document.getElementById('topbar');
+      if (window.scrollY > 20) {
+        topbar.classList.add('scrolled');
+      } else {
+        topbar.classList.remove('scrolled');
+      }
+    });
 
     function showSection(section) {
       document.querySelectorAll('.topbar-btn').forEach(b => b.classList.remove('active'));
@@ -358,7 +401,7 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=14');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=15');
     }
   </script>
 </body>
