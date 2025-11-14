@@ -6,7 +6,7 @@
   <title>ZapWallet</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=2" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=3" />
   <meta name="theme-color" content="#00D1FF" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -18,7 +18,6 @@
       --zap-blue: #00D1FF;
       --zap-dark: #0A0A0A;
       --zap-light: #FFFFFF;
-      --card-bg: #1A1A1A;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -42,7 +41,6 @@
       background: linear-gradient(90deg, #00D1FF, #0099CC);
       padding: 20px;
       text-align: center;
-      position: relative;
     }
     .header img {
       height: 50px;
@@ -53,7 +51,6 @@
       font-weight: 700;
       margin-top: 8px;
       color: white;
-      letter-spacing: 1px;
     }
     .status {
       background: rgba(0, 209, 255, 0.1);
@@ -88,7 +85,7 @@
       font-size: 14px;
       color: var(--zap-blue);
     }
-    input {
+    select, input {
       width: 100%;
       padding: 14px;
       border-radius: 12px;
@@ -116,21 +113,14 @@
     #install-btn {
       background: linear-gradient(90deg, #00D1FF, #0099CC);
       color: white;
-      font-weight: 700;
     }
     .wallet-btn {
       background: #1E293B;
       color: white;
       border: 1px solid rgba(0, 209, 255, 0.3);
     }
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.7; }
-      100% { opacity: 1; }
-    }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
 </head>
 <body>
@@ -139,12 +129,24 @@
       <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapWallet">
       <h1>ZapWallet</h1>
     </div>
-    <div class="status pulse">Arc Testnet Live</div>
+    <div class="status pulse" id="network-status">Select Network</div>
+
+    <div class="card">
+      <div class="label">Select Network</div>
+      <select id="chain-select" onchange="switchChain()">
+        <option value="">Choose...</option>
+        <option value="arc">Arc Testnet</option>
+        <option value="eth">Ethereum Mainnet</option>
+        <option value="polygon">Polygon</option>
+        <option value="bsc">BNB Chain</option>
+        <option value="avalanche">Avalanche</option>
+      </select>
+    </div>
 
     <div class="card">
       <div class="label">Wallet</div>
       <div class="value"><code id="wallet">Not Connected</code></div>
-      <div class="value">Balance: <span id="w">-</span> USDC</div>
+      <div class="value">Balance: <span id="w">-</span> <span id="symbol">—</span></div>
       <button class="wallet-btn" onclick="connect('metamask')">MetaMask</button>
       <button class="wallet-btn" onclick="connect('okx')">OKX Wallet</button>
       <button class="wallet-btn" onclick="connect('phantom')">Phantom</button>
@@ -159,9 +161,9 @@
 
     <div class="card">
       <div class="label">Smart Contract</div>
-      <div class="value">Address: <code>0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697</code></div>
+      <div class="value">Address: <code id="contract-addr">-</code></div>
       <div class="value">Greeting: <span id="greet">-</span></div>
-      <div class="value">Balance: <span id="bal">-</span> USDC</div>
+      <div class="value">Balance: <span id="bal">-</span> <span id="symbol2">—</span></div>
     </div>
 
     <div class="card">
@@ -178,30 +180,72 @@
 
   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
   <script>
-    const RPC = "https://rpc.testnet.arc.network";
-    const CONTRACT = "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697";
-    const ABI = [{"inputs":[],"name":"getGreeting","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"type":"string"}],"name":"setGreeting","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+    // === Multi-Chain Config ===
+    const CHAINS = {
+      arc: {
+        name: "Arc Testnet",
+        rpc: "https://rpc.testnet.arc.network",
+        chainId: 12345,
+        symbol: "USDC",
+        contract: "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697",
+        abi: [{"inputs":[],"name":"getGreeting","outputs":[{"type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"type":"string"}],"name":"setGreeting","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+      },
+      eth: {
+        name: "Ethereum",
+        rpc: "https://eth-mainnet.g.alchemy.com/v2/demo",
+        chainId: 1,
+        symbol: "ETH",
+        contract: null
+      },
+      polygon: {
+        name: "Polygon",
+        rpc: "https://polygon-rpc.com",
+        chainId: 137,
+        symbol: "MATIC",
+        contract: null
+      },
+      bsc: {
+        name: "BNB Chain",
+        rpc: "https://bsc-dataseed.binance.org",
+        chainId: 56,
+        symbol: "BNB",
+        contract: null
+      },
+      avalanche: {
+        name: "Avalanche",
+        rpc: "https://api.avax.network/ext/bc/C/rpc",
+        chainId: 43114,
+        symbol: "AVAX",
+        contract: null
+      }
+    };
 
-    let provider, signer, contract, account;
+    let provider, signer, contract, account, currentChain = null;
+
+    function switchChain() {
+      const chainKey = document.getElementById('chain-select').value;
+      if (!chainKey) return;
+      currentChain = CHAINS[chainKey];
+      document.getElementById('network-status').textContent = `${currentChain.name} Live`;
+      document.getElementById('contract-addr').textContent = currentChain.contract || "N/A";
+      load();
+    }
 
     async function connect(wallet) {
       let ethProvider;
-      if (wallet === 'metamask' && window.ethereum?.isMetaMask) {
-        ethProvider = window.ethereum;
-      } else if (wallet === 'okx' && window.okxwallet) {
-        ethProvider = window.okxwallet;
-      } else if (wallet === 'phantom' && window.phantom?.ethereum) {
-        ethProvider = window.phantom.ethereum;
-      } else {
-        return alert(`Please install ${wallet === 'okx' ? 'OKX Wallet' : wallet === 'phantom' ? 'Phantom' : 'MetaMask'}`);
-      }
+      if (wallet === 'metamask' && window.ethereum?.isMetaMask) ethProvider = window.ethereum;
+      else if (wallet === 'okx' && window.okxwallet) ethProvider = window.okxwallet;
+      else if (wallet === 'phantom' && window.phantom?.ethereum) ethProvider = window.phantom.ethereum;
+      else return alert(`Install ${wallet}`);
 
       try {
         await ethProvider.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(ethProvider);
         signer = provider.getSigner();
         account = await signer.getAddress();
-        contract = new ethers.Contract(CONTRACT, ABI, signer);
+        if (currentChain?.contract) {
+          contract = new ethers.Contract(currentChain.contract, currentChain.abi, signer);
+        }
         document.getElementById('wallet').textContent = account.slice(0,10)+"...";
         document.querySelectorAll('.wallet-btn').forEach(b => b.disabled = true);
         load();
@@ -209,7 +253,7 @@
     }
 
     async function updateGreeting() {
-      if (!contract) return alert("Connect wallet first!");
+      if (!contract) return alert("No contract on this chain!");
       const greeting = document.getElementById('new-greeting').value.trim();
       if (!greeting) return;
       const status = document.getElementById('tx-status');
@@ -226,36 +270,45 @@
     }
 
     async function load() {
+      if (!currentChain) return;
       try {
-        const [cid, blk, gas, greet, bal, wbal] = await Promise.all([
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_chainId",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_blockNumber",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_gasPrice",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_call",params:[{to:CONTRACT,data:"0x9c1bb7d9"},"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=> { const s = d.result.slice(130).replace(/0+$/,''); return new TextDecoder().decode(new Uint8Array(s.match(/.{2}/g).map(b=>parseInt(b,16)))); }),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_getBalance",params:[CONTRACT,"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          account ? fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_getBalance",params:[account,"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)) : 0
+        const rpcProvider = new ethers.providers.JsonRpcProvider(currentChain.rpc);
+        const [cid, blk, gas, wbal] = await Promise.all([
+          rpcProvider.getNetwork().then(n => n.chainId),
+          rpcProvider.getBlockNumber(),
+          rpcProvider.getGasPrice().then(g => g.toNumber()),
+          account ? rpcProvider.getBalance(account).then(b => b.toString()) : "0"
         ]);
+
+        let greet = "-", bal = "-";
+        if (currentChain.contract && contract) {
+          try {
+            greet = await contract.getGreeting();
+            bal = (await rpcProvider.getBalance(currentChain.contract)).toString();
+          } catch(e) {}
+        }
+
         document.getElementById("cid").textContent = cid;
         document.getElementById("blk").textContent = blk.toLocaleString();
         document.getElementById("gas").textContent = (gas/1e9).toFixed(2)+" Gwei";
         document.getElementById("greet").textContent = greet;
-        document.getById("bal").textContent = (bal/1e18).toFixed(6);
-        document.getElementById("w").textContent = account ? (wbal/1e18).toFixed(6) : "-";
-      } catch(e) {}
+        document.getElementById("bal").textContent = bal !== "-" ? (parseInt(bal)/1e18).toFixed(6) : "-";
+        document.getElementById("w").textContent = account ? (parseInt(wbal)/1e18).toFixed(6) : "-";
+        document.getElementById("symbol").textContent = currentChain.symbol;
+        document.getElementById("symbol2").textContent = currentChain.symbol;
+      } catch(e) { console.error(e); }
     }
-    setInterval(load, 5000); load();
+    setInterval(() => { if (currentChain) load(); }, 5000);
 
     // Notifications
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
+    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
     function sendPush() {
       if (Notification.permission === 'granted') {
-        new Notification('ZapWallet', { body: 'Greeting updated: ' + document.getElementById('greet').textContent, icon: '/hello-arc-pwa/icons/icon-192.png' });
+        new Notification('ZapWallet', { body: 'Greeting updated!', icon: '/hello-arc-pwa/icons/icon-192.png' });
       }
     }
 
-    // PWA Install
+    // PWA
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -263,7 +316,7 @@
       document.getElementById('install-btn').style.display = 'block';
     });
     document.getElementById('install-btn').onclick = () => {
-      if (!deferredPrompt) return alert("Use Chrome menu → Install");
+      if (!deferredPrompt) return alert("Use Chrome → Install");
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(() => {
         document.getElementById('install-btn').textContent = "Installed!";
@@ -272,7 +325,7 @@
     };
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=2');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=3');
     }
   </script>
 </body>
