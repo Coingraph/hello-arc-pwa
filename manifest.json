@@ -4,154 +4,18 @@
   "description": "مراقبة عقدك الذكي على Arc Testnet",
   "start_url": "/",
   "display": "standalone",
-
-cat > index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arc Testnet Monitor</title>
-
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#38bdf8" />
-  <link rel="icon" href="icons/icon-192.png" />
-
-  <style>
-    body { font-family: Tahoma; background: #0f172a; color: #e2e8f0; padding: 20px; margin: 0; }
-    .c { max-width: 700px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; }
-    h1 { color: #38bdf8; text-align: center; margin: 0 0 20px; }
-    .card { background: #334155; padding: 14px; border-radius: 10px; margin: 12px 0; }
-    .l { color: #94a3b8; font-weight: bold; }
-    .v { color: #fff; }
-    code { background: #1e40af; padding: 2px 6px; border-radius: 4px; }
-    input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
-    button { background: #38bdf8; color: #0f172a; font-weight: bold; cursor: pointer; }
-    #install-btn { display: block !important; background: #10b981; }
-  </style>
-</head>
-<body>
-  <div class="c">
-    <h1>Arc Testnet Monitor</h1>
-
-    <div class="card">
-      <div class="l">المحفظة</div>
-      <div class="v"><code id="wallet">غير متصل</code></div>
-      <div class="v">الرصيد: <span id="w">-</span> USDC</div>
-      <button id="connect-btn">ربط MetaMask</button>
-    </div>
-
-    <div class="card">
-      <div class="l">العقدة</div>
-      <div class="v">Chain ID: <span id="cid">-</span></div>
-      <div class="v">Block: <span id="blk">-</span></div>
-      <div class="v">Gas: <span id="gas">-</span></div>
-    </div>
-
-    <div class="card">
-      <div class="l">العقد الذكي</div>
-      <div class="v">عنوان: <code>0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697</code></div>
-      <div class="v">التحية: <span id="greet">-</span></div>
-      <div class="v">الرصيد: <span id="bal">-</span> USDC</div>
-    </div>
-
-    <div class="card">
-      <div class="l">تحديث التحية</div>
-      <input type="text" id="new-greeting" placeholder="أدخل تحية جديدة..." />
-      <button onclick="updateGreeting()">إرسال</button>
-      <div id="tx-status"></div>
-    </div>
-
-    <button id="install-btn">تثبيت التطبيق (PWA)</button>
-  </div>
-
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-  <script>
-    const RPC = "https://rpc.testnet.arc.network";
-    const CONTRACT = "0xA5571061Ebc458AE33FdD260243B7B4e8EC4C697";
-    const ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"getGreeting","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_greeting","type":"string"}],"name":"setGreeting","outputs":[],"stateMutability":"nonpayable","type":"function"}];
-
-    let provider, signer, contract, account;
-
-    // Connect
-    document.getElementById('connect-btn').onclick = async () => {
-      if (!window.ethereum) return alert("قم بتثبيت MetaMask!");
-      try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        account = await signer.getAddress();
-        contract = new ethers.Contract(CONTRACT, ABI, signer);
-        document.getElementById('wallet').textContent = account;
-        document.getElementById('connect-btn').textContent = "متصل";
-        document.getElementById('connect-btn').disabled = true;
-        load();
-      } catch(e) { alert(e.message); }
-    };
-
-    // Update
-    async function updateGreeting() {
-      if (!contract) return alert("اربط MetaMask!");
-      const greeting = document.getElementById('new-greeting').value.trim();
-      if (!greeting) return;
-      const status = document.getElementById('tx-status');
-      status.textContent = "جاري...";
-      try {
-        const tx = await contract.setGreeting(greeting);
-        status.textContent = "في انتظار التأكيد...";
-        await tx.wait();
-        status.textContent = "تم!";
-        document.getElementById('new-greeting').value = "";
-        load();
-      } catch(e) { status.textContent = "فشل: " + e.message; }
+  "background_color": "#0f172a",
+  "theme_color": "#38bdf8",
+  "icons": [
+    {
+      "src": "/hello-arc-pwa/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/hello-arc-pwa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-
-    // Load
-    async function load() {
-      try {
-        const [cid, blk, gas, greet, bal, wbal] = await Promise.all([
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_chainId",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_blockNumber",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_gasPrice",params:[],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_call",params:[{to:CONTRACT,data:"0x9c1bb7d9"},"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=> { const s = d.result.slice(130).replace(/0+$/,''); return new TextDecoder().decode(new Uint8Array(s.match(/.{2}/g).map(b=>parseInt(b,16)))); }),
-          fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_getBalance",params:[CONTRACT,"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)),
-          account ? fetch(RPC, {method:"POST", body:JSON.stringify({jsonrpc:"2.0",method:"eth_getBalance",params:[account,"latest"],id:1}), headers:{"Content-Type":"application/json"}}).then(r=>r.json()).then(d=>parseInt(d.result,16)) : 0
-        ]);
-        document.getElementById("cid").textContent = cid;
-        document.getElementById("blk").textContent = blk.toLocaleString();
-        document.getElementById("gas").textContent = (gas/1e9).toFixed(2)+" Gwei";
-        document.getElementById("greet").textContent = greet;
-        document.getElementById("bal").textContent = (bal/1e18).toFixed(6);
-        document.getElementById("w").textContent = account ? (wbal/1e18).toFixed(6) : "-";
-      } catch(e) {}
-    }
-    setInterval(load, 5000); load();
-
-    // PWA Install (Force Show)
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log("PWA Install Ready!");
-    });
-
-    document.getElementById('install-btn').onclick = () => {
-      if (!deferredPrompt) {
-        alert("انتظر قليلاً... أو اضغط على النقاط الثلاث في Chrome → تثبيت");
-        return;
-      }
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        deferredPrompt = null;
-        document.getElementById('install-btn').textContent = "تم التثبيت!";
-        document.getElementById('install-btn').disabled = true;
-      });
-    };
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(() => console.log('SW OK'));
-    }
-  </script>
-</body>
-</html>
+  ]
+}
