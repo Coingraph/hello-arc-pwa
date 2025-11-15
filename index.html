@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=28" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=29" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -97,6 +97,7 @@
     .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
     .swap-btn:disabled { background: #065F46; opacity: 0.6; cursor: not-allowed; }
     .send-btn { background: #1D4ED8; color: white; }
+    .send-btn:disabled { background: #1E3A8A; opacity: 0.6; cursor: not-allowed; }
 
     .status { margin-top: 10px; font-size: 13px; color: #A7F3D0; text-align: center; }
 
@@ -150,16 +151,16 @@
   <div class="topbar">
     <div class="app-name">ZAPCHOK</div>
     <div class="buttons-row">
-      <div class="nav-btn active" id="btn-swap" onclick="showSection('swap')">
+      <div class="nav-btn active" id="btn-swap">
         <i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span>
       </div>
-      <div class="nav-btn" id="btn-messages" onclick="showSection('messages')">
+      <div class="nav-btn" id="btn-messages">
         <i class="fas fa-envelope"></i><span>Messages</span>
       </div>
-      <div class="nav-btn" id="btn-connect" onclick="openWalletModal()">
+      <div class="nav-btn" id="btn-connect">
         <i class="fas fa-wallet"></i><span>Connect</span>
       </div>
-      <div class="nav-btn" id="btn-staking" onclick="showSection('staking')">
+      <div class="nav-btn" id="btn-staking">
         <i class="fas fa-coins"></i><span>Staking</span>
       </div>
     </div>
@@ -181,7 +182,7 @@
           <input type="number" id="to-amount" placeholder="0.0" disabled />
           <div><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="token-icon"><span class="token-name">USDT</span></div>
         </div>
-        <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Swap</button>
+        <button class="btn swap-btn" id="swap-btn" disabled>Swap</button>
         <div id="swap-status" class="status"></div>
       </div>
     </div>
@@ -193,7 +194,7 @@
         <input type="file" id="file-input" class="file-input">
         <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
         <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="3"></textarea>
-        <button class="btn send-btn" id="send-btn" onclick="sendMessage()" disabled>Send</button>
+        <button class="btn send-btn" id="send-btn" disabled>Send</button>
         <div id="msg-status" class="status"></div>
       </div>
     </div>
@@ -210,8 +211,8 @@
 
     <!-- Extra -->
     <div class="extra-content">
-      <h3>Private Transfer (Offline Mode)</h3>
-      <p>Works even without internet after install</p>
+      <h3>100% Offline After Install</h3>
+      <p>Works in DZ even with slow internet</p>
     </div>
 
   </div>
@@ -220,160 +221,149 @@
   <div class="modal" id="wallet-modal">
     <div class="modal-content">
       <div class="modal-title">Connect Wallet</div>
-      <div class="wallet-option" onclick="connectWallet('metamask')">
+      <div class="wallet-option" data-wallet="metamask">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
         <span class="wallet-name">MetaMask</span>
       </div>
-      <div class="wallet-option" onclick="connectWallet('okx')">
+      <div class="wallet-option" data-wallet="okx">
         <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
         <span class="wallet-name">OKX Wallet</span>
       </div>
-      <div class="wallet-option" onclick="connectWallet('phantom')">
+      <div class="wallet-option" data-wallet="phantom">
         <img src="https://phantom.app/img/phantom-favicon.png" alt="Phantom">
         <span class="wallet-name">Phantom</span>
       </div>
     </div>
   </div>
 
-  <!-- Load ethers locally -->
+  <!-- Load ethers first -->
   <script src="/hello-arc-pwa/ethers.js"></script>
 
   <!-- Main Script -->
-  <script>
-    let provider, signer, account, xmtpClient;
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+      let provider, signer, account;
 
-    // Wait for ethers
-    function waitForEthers(callback, attempts = 0) {
-      if (typeof ethers !== 'undefined') {
-        callback();
-      } else if (attempts < 50) {
-        setTimeout(() => waitForEthers(callback, attempts + 1), 200);
-      } else {
-        alert("ethers failed to load. Try refreshing.");
+      // DOM Elements
+      const swapBtn = document.getElementById('swap-btn');
+      const sendBtn = document.getElementById('send-btn');
+      const connectBtn = document.getElementById('btn-connect');
+      const modal = document.getElementById('wallet-modal');
+
+      // Wait for ethers
+      function waitForEthers(callback, attempts = 0) {
+        if (typeof ethers !== 'undefined') {
+          callback();
+        } else if (attempts < 100) {
+          setTimeout(() => waitForEthers(callback, attempts + 1), 100);
+        } else {
+          alert("ethers failed. Refresh page.");
+        }
       }
-    }
 
-    waitForEthers(() => {
-      console.log("ethers ready");
-      initApp();
-    });
+      waitForEthers(() => {
+        console.log("ethers loaded");
+        setupEventListeners();
+      });
 
-    function initApp() {
+      function setupEventListeners() {
+        // Navigation
+        document.getElementById('btn-swap').addEventListener('click', () => showSection('swap'));
+        document.getElementById('btn-messages').addEventListener('click', () => showSection('messages'));
+        document.getElementById('btn-staking').addEventListener('click', () => showSection('staking'));
+        connectBtn.addEventListener('click', openWalletModal);
+
+        // Wallet options
+        document.querySelectorAll('.wallet-option').forEach(el => {
+          el.addEventListener('click', () => connectWallet(el.dataset.wallet));
+        });
+
+        // Modal close
+        modal.addEventListener('click', e => {
+          if (e.target === modal) closeWalletModal();
+        });
+      }
+
+      function showSection(section) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${section}`).classList.add('active');
+        ['swap', 'messages', 'staking'].forEach(s => {
+          document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
+        });
+      }
+
+      function updateConnectButton() {
+        if (account) {
+          connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
+          connectBtn.classList.add('connect-btn');
+          swapBtn.disabled = false;
+          sendBtn.disabled = false;
+        } else {
+          connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
+          connectBtn.classList.remove('connect-btn');
+          swapBtn.disabled = true;
+          sendBtn.disabled = true;
+        }
+      }
+
+      async function connectWallet(name) {
+        let eth = null;
+        if (name === 'metamask' && window.ethereum?.isMetaMask) eth = window.ethereum;
+        if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
+        if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
+
+        if (!eth) {
+          alert(`Open ${name} app and try again`);
+          return;
+        }
+
+        try {
+          await eth.request({ method: 'eth_requestAccounts' });
+          provider = new ethers.providers.Web3Provider(eth);
+          signer = provider.getSigner();
+          account = await signer.getAddress();
+          updateConnectButton();
+          closeWalletModal();
+          document.getElementById('swap-status').textContent = "Connected! Enter amount";
+          document.getElementById('msg-status').textContent = "Connected! Write message";
+        } catch (e) {
+          alert("Failed: " + e.message);
+        }
+      }
+
+      window.swapTokens = function() {
+        const amt = document.getElementById('from-amount').value;
+        if (!amt || amt <= 0) return alert("Enter amount");
+        const s = document.getElementById('swap-status');
+        s.textContent = "Swapping...";
+        setTimeout(() => {
+          document.getElementById('to-amount').value = amt;
+          s.textContent = "Swapped!";
+        }, 1500);
+      };
+
+      window.sendMessage = function() {
+        const to = document.getElementById('msg-recipient').value.trim();
+        const text = document.getElementById('msg-text').value;
+        if (!to || !text) return alert("Fill all");
+        const s = document.getElementById('msg-status');
+        s.textContent = "Sending...";
+        setTimeout(() => {
+          s.textContent = "Sent offline!";
+          localStorage.setItem('msg_' + Date.now(), JSON.stringify({ to, text }));
+          document.getElementById('msg-text').value = "";
+        }, 1000);
+      };
+
+      function openWalletModal() { modal.classList.add('show'); }
+      function closeWalletModal() { modal.classList.remove('show'); }
+
+      // Init
       updateConnectButton();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=28');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=29');
       }
-    }
-
-    function showSection(section) {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`btn-${section}`).classList.add('active');
-      ['swap', 'messages', 'staking'].forEach(s => {
-        document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
-      });
-    }
-
-    function updateConnectButton() {
-      const btn = document.getElementById('btn-connect');
-      if (account) {
-        btn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
-        btn.onclick = null;
-        btn.classList.add('connect-btn');
-        enableActions();
-      } else {
-        btn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
-        btn.onclick = openWalletModal;
-        btn.classList.remove('connect-btn');
-        disableActions();
-      }
-    }
-
-    function enableActions() {
-      document.getElementById('swap-btn').disabled = false;
-      document.getElementById('send-btn').disabled = false;
-    }
-
-    function disableActions() {
-      document.getElementById('swap-btn').disabled = true;
-      document.getElementById('send-btn').disabled = true;
-    }
-
-    async function connectWallet(name) {
-      let eth = null;
-      if (name === 'metamask' && window.ethereum?.isMetaMask) eth = window.ethereum;
-      if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
-      if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
-
-      if (!eth) return alert(`Please open ${name} and try again`);
-
-      try {
-        await eth.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(eth);
-        signer = provider.getSigner();
-        account = await signer.getAddress();
-        updateConnectButton();
-        closeWalletModal();
-        document.getElementById('swap-status').textContent = "Connected! Try Swap";
-        document.getElementById('msg-status').textContent = "Connected! Send a message";
-        await initXMTP();
-      } catch (e) {
-        alert("Connection failed: " + (e.message || "Try again"));
-      }
-    }
-
-    async function initXMTP() {
-      if (!signer) return;
-      try {
-        xmtpClient = await XMTP.Client.create(signer, { env: "dev" });
-      } catch (e) {
-        console.warn("XMTP not available");
-      }
-    }
-
-    async function swapTokens() {
-      if (!account) return alert("Connect wallet first");
-      const amt = document.getElementById('from-amount').value;
-      if (!amt || amt <= 0) return alert("Enter amount");
-      const s = document.getElementById('swap-status');
-      s.textContent = "Swapping...";
-      setTimeout(() => {
-        document.getElementById('to-amount').value = amt;
-        drinking s.textContent = "Swapped!";
-      }, 1500);
-    }
-
-    async function sendMessage() {
-      if (!account) return alert("Connect wallet first");
-      const to = document.getElementById('msg-recipient').value.trim();
-      const text = document.getElementById('msg-text').value;
-      if (!to || !text) return alert("Fill recipient and message");
-
-      const s = document.getElementById('msg-status');
-      s.textContent = "Sending...";
-
-      try {
-        if (xmtpClient) {
-          const conv = await xmtpClient.conversations.newConversation(to);
-          await conv.send(text);
-          s.textContent = "Sent via XMTP!";
-        } else {
-          s.textContent = "Sent offline (saved locally)";
-          localStorage.setItem('msg_' + Date.now(), JSON.stringify({ to, text }));
-        }
-        document.getElementById('msg-text').value = "";
-      } catch (e) {
-        s.textContent = "Sent offline";
-      }
-    }
-
-    function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
-    function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('show'); }
-    document.getElementById('wallet-modal').addEventListener('click', e => {
-      if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
-
-    // Auto-reconnect if wallet changes
-    window.ethereum?.on('accountsChanged', () => location.reload());
   </script>
 
 </body>
