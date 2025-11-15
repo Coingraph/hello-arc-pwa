@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=27" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=28" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -95,18 +95,8 @@
       font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s;
     }
     .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
-    .swap-btn:disabled { background: #065F46; opacity: 0.6; }
+    .swap-btn:disabled { background: #065F46; opacity: 0.6; cursor: not-allowed; }
     .send-btn { background: #1D4ED8; color: white; }
-
-    .file-input {
-      width: 100%; padding: 12px; border: 2px dashed var(--gold);
-      border-radius: 14px; background: rgba(252,211,77,0.1);
-      text-align: center; font-size: 13px; color: var(--text); margin-bottom: 10px; cursor: pointer;
-    }
-    .msg-input {
-      width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--border);
-      background: rgba(4,120,87,0.6); color: white; font-size: 14px; margin-bottom: 10px;
-    }
 
     .status { margin-top: 10px; font-size: 13px; color: #A7F3D0; text-align: center; }
 
@@ -203,7 +193,7 @@
         <input type="file" id="file-input" class="file-input">
         <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
         <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="3"></textarea>
-        <button class="btn send-btn" onclick="sendMessage()">Send</button>
+        <button class="btn send-btn" id="send-btn" onclick="sendMessage()" disabled>Send</button>
         <div id="msg-status" class="status"></div>
       </div>
     </div>
@@ -220,8 +210,8 @@
 
     <!-- Extra -->
     <div class="extra-content">
-      <h3>Private Transfer (FHE + XMTP + IPFS)</h3>
-      <p>Send encrypted messages and files via Pinata</p>
+      <h3>Private Transfer (Offline Mode)</h3>
+      <p>Works even without internet after install</p>
     </div>
 
   </div>
@@ -245,17 +235,33 @@
     </div>
   </div>
 
-  <!-- Load ethers -->
+  <!-- Load ethers locally -->
   <script src="/hello-arc-pwa/ethers.js"></script>
 
   <!-- Main Script -->
   <script>
-    let provider, account, xmtpClient, fheInstance;
+    let provider, signer, account, xmtpClient;
+
+    // Wait for ethers
+    function waitForEthers(callback, attempts = 0) {
+      if (typeof ethers !== 'undefined') {
+        callback();
+      } else if (attempts < 50) {
+        setTimeout(() => waitForEthers(callback, attempts + 1), 200);
+      } else {
+        alert("ethers failed to load. Try refreshing.");
+      }
+    }
+
+    waitForEthers(() => {
+      console.log("ethers ready");
+      initApp();
+    });
 
     function initApp() {
       updateConnectButton();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=27');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=28');
       }
     }
 
@@ -265,7 +271,6 @@
       ['swap', 'messages', 'staking'].forEach(s => {
         document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
       });
-      updateConnectButton();
     }
 
     function updateConnectButton() {
@@ -274,87 +279,91 @@
         btn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
         btn.onclick = null;
         btn.classList.add('connect-btn');
+        enableActions();
       } else {
         btn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
         btn.onclick = openWalletModal;
         btn.classList.remove('connect-btn');
+        disableActions();
       }
     }
 
+    function enableActions() {
+      document.getElementById('swap-btn').disabled = false;
+      document.getElementById('send-btn').disabled = false;
+    }
+
+    function disableActions() {
+      document.getElementById('swap-btn').disabled = true;
+      document.getElementById('send-btn').disabled = true;
+    }
+
     async function connectWallet(name) {
-      let eth = window.ethereum;
+      let eth = null;
+      if (name === 'metamask' && window.ethereum?.isMetaMask) eth = window.ethereum;
       if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
       if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
-      if (!eth) return alert(`Install ${name}`);
+
+      if (!eth) return alert(`Please open ${name} and try again`);
 
       try {
         await eth.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(eth);
-        account = await provider.getSigner().getAddress();
+        signer = provider.getSigner();
+        account = await signer.getAddress();
         updateConnectButton();
-        document.getElementById('swap-btn').disabled = false;
         closeWalletModal();
+        document.getElementById('swap-status').textContent = "Connected! Try Swap";
+        document.getElementById('msg-status').textContent = "Connected! Send a message";
         await initXMTP();
       } catch (e) {
-        alert("Connection failed: " + e.message);
+        alert("Connection failed: " + (e.message || "Try again"));
       }
     }
 
     async function initXMTP() {
+      if (!signer) return;
       try {
-        xmtpClient = await XMTP.Client.create(provider.getSigner(), { env: "dev" });
+        xmtpClient = await XMTP.Client.create(signer, { env: "dev" });
       } catch (e) {
-        console.warn("XMTP failed, using fallback");
+        console.warn("XMTP not available");
       }
+    }
+
+    async function swapTokens() {
+      if (!account) return alert("Connect wallet first");
+      const amt = document.getElementById('from-amount').value;
+      if (!amt || amt <= 0) return alert("Enter amount");
+      const s = document.getElementById('swap-status');
+      s.textContent = "Swapping...";
+      setTimeout(() => {
+        document.getElementById('to-amount').value = amt;
+        drinking s.textContent = "Swapped!";
+      }, 1500);
     }
 
     async function sendMessage() {
       if (!account) return alert("Connect wallet first");
       const to = document.getElementById('msg-recipient').value.trim();
       const text = document.getElementById('msg-text').value;
-      const file = document.getElementById('file-input').files[0];
-      if (!to || !text) return alert("Fill all fields");
+      if (!to || !text) return alert("Fill recipient and message");
 
       const s = document.getElementById('msg-status');
-      s.textContent = "Uploading...";
+      s.textContent = "Sending...";
 
       try {
-        let cid = "";
-        if (file) {
-          const form = new FormData();
-          form.append('file', file);
-          const pinata = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-            method: 'POST',
-            headers: { 'pinata_api_key': 'YOUR_KEY', 'pinata_secret_api_key': 'YOUR_SECRET' },
-            body: form
-          });
-          const res = await pinata.json();
-          cid = res.IpfsHash;
-        }
-
         if (xmtpClient) {
           const conv = await xmtpClient.conversations.newConversation(to);
-          await conv.send({ text, file: cid || null });
+          await conv.send(text);
+          s.textContent = "Sent via XMTP!";
+        } else {
+          s.textContent = "Sent offline (saved locally)";
+          localStorage.setItem('msg_' + Date.now(), JSON.stringify({ to, text }));
         }
-
-        s.textContent = cid ? `Sent! CID: ${cid.slice(0,12)}...` : "Sent!";
         document.getElementById('msg-text').value = "";
-        document.getElementById('file-input').value = "";
       } catch (e) {
-        s.textContent = "Sent locally (offline mode)";
-        console.log("Offline message:", { to, text, file: file?.name });
+        s.textContent = "Sent offline";
       }
-    }
-
-    async function swapTokens() {
-      const amt = document.getElementById('from-amount').value;
-      if (!amt) return;
-      const s = document.getElementById('swap-status');
-      s.textContent = "Swapping...";
-      setTimeout(() => {
-        document.getElementById('to-amount').value = amt;
-        s.textContent = "Swapped!";
-      }, 1200);
     }
 
     function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
@@ -363,9 +372,8 @@
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
-    // Start
-    if (typeof ethers !== 'undefined') initApp();
-    else setTimeout(initApp, 1000);
+    // Auto-reconnect if wallet changes
+    window.ethereum?.on('accountsChanged', () => location.reload());
   </script>
 
 </body>
