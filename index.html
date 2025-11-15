@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=25" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=26" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -317,7 +317,7 @@
         <span class="wallet-name">MetaMask</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('okx')">
-        <img src="https://static.okx.com/cdn/assets/imgs/221/2218C1D4B9D2B8D3C2F.png" alt="OKX">
+        <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
         <span class="wallet-name">OKX Wallet</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
@@ -327,30 +327,30 @@
     </div>
   </div>
 
-  <!-- Load ethers from CDN with fallback to local -->
+  <!-- Load ethers: CDN → Local Fallback -->
   <script>
     let provider, account, xmtpClient, fheInstance, w3;
 
     function loadEthers() {
-      const cdnUrl = 'https://cdn.ethers.io/lib/ethers-5.2.umd.min.js';
+      const cdnUrl = 'https://unpkg.com/ethers@5.2.0/dist/ethers.umd.min.js';
       const localUrl = '/hello-arc-pwa/ethers.js';
 
       const script = document.createElement('script');
-      script.src = cdnUrl;
+      script.src = cdnUrl + '?t=' + Date.now();
       script.onload = () => {
-        console.log('ethers loaded from CDN');
+        console.log('ethers loaded from CDN (unpkg)');
         initApp();
       };
       script.onerror = () => {
         console.warn('CDN failed, loading local ethers.js');
         const localScript = document.createElement('script');
-        localScript.src = localUrl + '?v=' + Date.now();
+        localScript.src = localUrl + '?t=' + Date.now();
         localScript.onload = () => {
           console.log('ethers loaded from local');
           initApp();
         };
         localScript.onerror = () => {
-          alert('Failed to load ethers. Check your internet or use VPN.');
+          document.body.innerHTML = '<div style="text-align:center;padding:50px;color:white;font-size:18px;">Failed to load ethers. Check internet or use VPN.</div>';
         };
         document.head.appendChild(localScript);
       };
@@ -360,7 +360,7 @@
     function initApp() {
       updateConnectButton();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=25');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=26');
       }
     }
 
@@ -470,11 +470,11 @@
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
-    // Start
+    // Start loading ethers
     loadEthers();
   </script>
 
-  <!-- Other libraries -->
+  <!-- Other Libraries -->
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
   <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
   <script src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
