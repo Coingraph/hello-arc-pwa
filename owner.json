@@ -1,0 +1,17 @@
+{
+  "app": "ZapChok",
+  "version": "1.0.0",
+  "owner": {
+    "github": "coingraph",
+    "eth_address": "0xeea5b26b94e4e5ba416c9725e51ab755e2dde107",
+    "email": "walletverse.eth@gmail.com",
+    "verified_at": "2025-11-15T21:12:00Z"
+  },
+  "integrations": {
+    "xmtp": "0xeea5b26b94e4e5ba416c9725e51ab755e2dde107",
+    "storacha": "walletverse.eth@gmail.com",
+    "zama_fhe": "0xeea5b26b94e4e5ba416c9725e51ab755e2dde107",
+    "arc_network": "0xeea5b26b94e4e5ba416c9725e51ab755e2dde107"
+  },
+  "signature": "SIGN_HERE_LATER_WITH_0xeea5..."
+}
