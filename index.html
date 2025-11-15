@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ZapDEX</title>
+  <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=17" />
-  <meta name="theme-color" content="#10B981" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=18" />
+  <meta name="theme-color" content="#7C3AED" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
@@ -24,30 +24,30 @@
 
   <style>
     :root {
-      --green: #10B981;
+      --purple: #7C3AED;
       --blue: #3B82F6;
       --yellow: #FBBF24;
-      --dark: #0F172A;
-      --card: #1E293B;
-      --border: #334155;
-      --text: #F8FAFC;
-      --muted: #94A3B8;
+      --dark: #1E1B4B;
+      --card: #2D1B69;
+      --border: #5B21B6;
+      --text: #E9D5FF;
+      --muted: #C4B5FD;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: auto; min-height: 100vh; overflow-x: hidden; }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--dark);
+      background: linear-gradient(135deg, #4C1D95, #1E1B4B);
       color: var(--text);
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar - Fixed, Centered Logo */
+    /* Top Bar - Fixed, Side Buttons */
     .topbar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      height: 64px;
-      background: rgba(15, 23, 42, 0.98);
+      height: 70px;
+      background: rgba(30, 20, 80, 0.9);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -57,114 +57,125 @@
       z-index: 1000;
     }
 
-    /* Side Buttons */
     .topbar-left, .topbar-right {
       display: flex; align-items: center; gap: 12px;
     }
     .topbar-btn {
-      width: 44px; height: 44px;
-      border-radius: 14px;
+      width: 48px; height: 48px;
+      border-radius: 16px;
       display: flex;
       align-items: center; justify-content: center;
       cursor: pointer;
-      font-size: 17px;
-      color: var(--text);
-      transition: background 0.2s;
+      font-size: 18px;
+      color: white;
+      background: rgba(139, 92, 246, 0.3);
+      transition: all 0.2s;
     }
     .topbar-btn.active {
       background: var(--yellow);
-      color: #0F172A;
+      color: #1E1B4B;
       font-weight: 700;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
     }
-    .topbar-btn:hover { background: rgba(251, 191, 36, 0.15); }
+    .topbar-btn:hover { background: rgba(251, 191, 36, 0.3); }
 
-    /* Center Logo - Fixed, No Motion */
+    /* Center Logo - Big Circle */
     .logo-center {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex; align-items: center; gap: 8px;
-      font-size: 21px; font-weight: 800; color: white;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px; height: 100px;
+      background: radial-gradient(circle at 30% 30%, #60A5FA, #3B82F6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center; justify-content: center;
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+      z-index: 10;
     }
-    .logo-center img {
-      height: 34px;
+    .logo-center::before {
+      content: "O";
+      font-size: 48px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* Main - Full Vertical Scroll */
+    /* Main */
     .main {
-      padding: 80px 16px 120px;
+      padding: 100px 16px 120px;
       min-height: 100vh;
     }
 
     .card {
       background: var(--card);
-      border-radius: 18px;
-      padding: 18px;
+      border-radius: 24px;
+      padding: 20px;
       border: 1px solid var(--border);
-      margin-bottom: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     .card-title {
       font-size: 16px; font-weight: 600; color: white;
-      margin-bottom: 14px; display: flex; justify-content: space-between;
+      margin-bottom: 16px; text-align: center;
     }
-    .badge { background: var(--yellow); color: #0F172A; font-size: 10px; padding: 3px 7px; border-radius: 7px; font-weight: 700; }
 
     /* Token Row */
     .token-row {
       display: flex; align-items: center;
-      background: rgba(30, 41, 59, 0.7);
-      border-radius: 14px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
+      background: rgba(88, 28, 135, 0.5);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       border: 1px solid var(--border);
     }
     .token-row input {
       flex: 1; background: transparent; border: none;
-      color: white; font-size: 19px; font-weight: 600;
+      color: white; font-size: 20px; font-weight: 600;
       text-align: right; outline: none;
     }
-    .token-icon { width: 26px; height: 26px; margin-right: 8px; border-radius: 50%; }
-    .token-name { font-weight: 600; color: white; font-size: 13px; }
+    .token-icon { width: 28px; height: 28px; margin-right: 10px; border-radius: 50%; }
+    .token-name { font-weight: 600; color: white; font-size: 14px; }
 
-    .swap-arrow { text-align: center; margin: 6px 0; font-size: 18px; color: var(--muted); }
+    .swap-arrow { text-align: center; margin: 8px 0; font-size: 20px; color: var(--muted); }
 
     .btn {
-      width: 100%; padding: 14px;
-      border-radius: 14px; border: none;
+      width: 100%; padding: 16px;
+      border-radius: 16px; border: none;
       font-weight: 700; font-size: 16px;
-      cursor: pointer; margin-top: 10px;
+      cursor: pointer; margin-top: 12px;
+      transition: 0.2s;
     }
-    .swap-btn { background: linear-gradient(90deg, var(--green), #34D399); color: white; }
-    .swap-btn:disabled { background: #334155; }
+    .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
+    .swap-btn:disabled { background: #5B21B6; }
     .send-btn { background: var(--blue); color: white; }
 
     /* Messages */
     .file-input {
-      width: 100%; padding: 12px;
-      border: 1px dashed var(--yellow);
-      border-radius: 12px;
-      background: rgba(251, 191, 36, 0.05);
-      text-align: center; font-size: 13px;
-      color: var(--text); margin-bottom: 10px;
+      width: 100%; padding: 14px;
+      border: 2px dashed var(--yellow);
+      border-radius: 16px;
+      background: rgba(251, 191, 36, 0.1);
+      text-align: center; font-size: 14px;
+      color: var(--text); margin-bottom: 12px;
       cursor: pointer;
     }
     .msg-input {
-      width: 100%; padding: 12px;
-      border-radius: 12px; border: 1px solid var(--border);
-      background: rgba(30, 41, 59, 0.7); color: white;
-      font-size: 14px; margin-bottom: 10px;
+      width: 100%; padding: 14px;
+      border-radius: 16px; border: 1px solid var(--border);
+      background: rgba(88, 28, 135, 0.5); color: white;
+      font-size: 15px; margin-bottom: 12px;
     }
 
-    .status { margin-top: 10px; font-size: 13px; color: var(--success); text-align: center; }
+    .status { margin-top: 12px; font-size: 14px; color: #A78BFA; text-align: center; }
 
-    /* Wallet Button */
+    /* Connect Button - Yellow */
     #connect-btn {
-      background: var(--blue); color: white;
-      font-weight: 600; padding: 14px;
-      border-radius: 14px; text-align: center;
-      font-size: 15px; margin: 16px 0;
+      background: var(--yellow); color: #1E1B4B;
+      font-weight: 700; padding: 16px;
+      border-radius: 16px; text-align: center;
+      font-size: 16px; margin: 20px 0;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
     }
 
     /* Modal */
@@ -176,33 +187,47 @@
     }
     .modal.show { display: flex; }
     .modal-content {
-      background: var(--card); border-radius: 20px 20px 0 0;
-      padding: 20px; width: 100%; max-width: 100%;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+      background: var(--card); border-radius: 24px 24px 0 0;
+      padding: 24px; width: 100%; max-width: 100%;
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.3);
     }
-    .modal-title { text-align: center; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: white; }
+    .modal-title { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 16px; color: white; }
+
+    .wallet-option {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px;
+      background: rgba(139, 92, 246, 0.2);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .wallet-option:hover { background: rgba(139, 92, 246, 0.4); }
+    .wallet-option img { width: 40px; height: 40px; border-radius: 12px; }
+    .wallet-name { font-weight: 600; color: white; }
 
     /* Extra Content */
     .extra-content {
       padding: 20px 16px;
       background: var(--card);
-      border-radius: 18px;
-      margin: 16px 0;
+      border-radius: 24px;
+      margin: 20px 0;
       border: 1px solid var(--border);
+      text-align: center;
     }
-    .extra-content h3 { font-size: 15px; margin-bottom: 8px; color: var(--yellow); }
-    .extra-content p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .extra-content h3 { font-size: 16px; margin-bottom:atrix: 10px; color: var(--yellow); }
+    .extra-content p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
     @media (min-width: 480px) {
       .topbar { padding: 0 20px; }
-      .modal-content { border-radius: 20px; max-width: 380px; }
+      .modal-content { border-radius: 24px; max-width: 380px; }
       .modal { align-items: center; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar - Fixed, Centered Logo (No Motion) -->
+  <!-- Top Bar -->
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-btn active" id="btn-swap" onclick="showSection('swap')">
@@ -213,11 +238,8 @@
       </div>
     </div>
 
-    <!-- Center Logo - Fixed -->
-    <div class="logo-center">
-      <img src="https://i.imgur.com/2rG5n8E.png" alt="ZapDEX">
-      <span>ZapDEX</span>
-    </div>
+    <!-- Big Circle Logo -->
+    <div class="logo-center"></div>
 
     <div class="topbar-right">
       <div class="topbar-btn" id="btn-staking" onclick="showSection('staking')">
@@ -226,13 +248,13 @@
     </div>
   </div>
 
-  <!-- Main - Vertical Scroll -->
+  <!-- Main -->
   <div class="main">
 
     <!-- Swap -->
     <div id="swap-section">
       <div class="card">
-        <div class="card-title">Swap <span class="badge">FHE</span></div>
+        <div class="card-title">Swap</div>
         <div class="token-row">
           <input type="number" id="from-amount" placeholder="0.0" />
           <div>
@@ -258,10 +280,10 @@
     <!-- Messages -->
     <div id="messages-section" style="display:none;">
       <div class="card">
-        <div class="card-title">Send <span class="badge">IPFS</span></div>
+        <div class="card-title">Send Message</div>
         <input type="file" id="file-input" class="file-input">
         <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
-        <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="2"></textarea>
+        <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="3"></textarea>
         <button class="btn send-btn" onclick="sendMessage()">Send</button>
         <div id="msg-status" class="status"></div>
       </div>
@@ -271,24 +293,16 @@
     <div id="staking-section" style="display:none;">
       <div class="card">
         <div class="card-title">Stake USDC</div>
-        <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:12px;">
-        <button class="btn" style="background:var(--yellow);color:#0F172A;">Stake</button>
-        <div class="status" style="color:var(--muted);margin-top:8px;">APY: <strong style="color:var(--green);">12.5%</strong></div>
+        <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:14px;">
+        <button class="btn" style="background:var(--yellow);color:#1E1B4B;">Stake</button>
+        <div class="status" style="color:var(--muted);margin-top:10px;">APY: <strong style="color:var(--yellow);">12.5%</strong></div>
       </div>
     </div>
 
-    <!-- Extra Vertical Content -->
+    <!-- Extra -->
     <div class="extra-content">
-      <h3>Privacy First</h3>
-      <p>All swaps are FHE-encrypted. Messages are sent via XMTP. Files stored on IPFS.</p>
-    </div>
-    <div class="extra-content">
-      <h3>Arc Testnet</h3>
-      <p>Connected to Arc Network. Test USDC to USDT swaps with full privacy.</p>
-    </div>
-    <div class="extra-content">
-      <h3>Zama + XMTP</h3>
-      <p>Powered by Zama FHE and XMTP for confidential DeFi and messaging.</p>
+      <h3>Private Transfer (FHE + XMTP)</h3>
+      <p>Send encrypted messages and files via IPFS</p>
     </div>
 
   </div>
@@ -303,7 +317,7 @@
       </div>
       <div class="wallet-option" onclick="connectWallet('okx')">
         <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
-        <span class="wallet-name">OKX</span>
+        <span class="wallet-name">OKX Wallet</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
         <img src="https://phantom.app/img/phantom-favicon.png" alt="Phantom">
@@ -346,7 +360,7 @@
       if (window.fhevm) fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 });
       if (provider) xmtpClient = await XMTP.Client.create(provider.getSigner());
       try {
-        w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBERVgifQ.9kR8v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2v2' });
+        w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBDaG9rIn0.abc123' });
       } catch(e) {}
     }
 
@@ -396,7 +410,7 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=17');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=18');
     }
   </script>
 </body>
