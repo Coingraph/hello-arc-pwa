@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=26" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=27" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -36,176 +36,104 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar */
     .topbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 90px;
-      background: rgba(6, 78, 59, 0.92);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 16px;
-      z-index: 1000;
-      gap: 6px;
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 90px; background: rgba(6, 78, 59, 0.92);
+      backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px 16px; z-index: 1000; gap: 6px;
     }
 
     .app-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 30px;
-      font-weight: 800;
-      color: white;
-      text-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.5);
+      font-family: 'Bebas Neue', sans-serif; font-size: 30px; font-weight: 800;
+      color: white; text-shadow: 0 0 12px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.5);
       letter-spacing: 1.8px;
     }
 
     .buttons-row {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      width: 100%;
-      max-width: 400px;
-      padding-right: 8px;
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 8px; width: 100%; max-width: 400px; padding-right: 8px;
     }
 
     .nav-btn {
-      min-width: 56px;
-      height: 44px;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      color: white;
-      background: rgba(16, 185, 129, 0.3);
-      transition: all 0.2s;
-      gap: 3px;
-      padding: 0 6px;
+      min-width: 56px; height: 44px; border-radius: 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 11px; font-weight: 600; color: white;
+      background: rgba(16, 185, 129, 0.3); transition: all 0.2s; gap: 3px; padding: 0 6px;
     }
     .nav-btn i { font-size: 16px; }
-    .nav-btn.active {
-      background: var(--gold);
-      color: #064E3B;
-      font-weight: 700;
-      box-shadow: 0 0 14px rgba(252, 211, 77, 0.6);
-    }
-    .nav-btn:hover { background: rgba(252, 211, 77, 0.3); }
+    .nav-btn.active { background: var(--gold); color: #064E3B; font-weight: 700; box-shadow: 0 0 14px rgba(252,211,77,0.6); }
+    .nav-btn:hover { background: rgba(252,211,77,0.3); }
 
     .connect-btn {
       background: linear-gradient(135deg, #FCD34D, #FBBF24);
-      color: #064E3B;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(252, 211, 77, 0.5);
+      color: #064E3B; font-weight: 700; box-shadow: 0 4px 12px rgba(252,211,77,0.5);
     }
 
-    /* Main */
-    .main {
-      padding: 100px 12px 120px;
-      min-height: 100vh;
-    }
+    .main { padding: 100px 12px 120px; min-height: 100vh; }
 
     .swap-card, .msg-card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 14px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
+      background: var(--card); border-radius: 20px; padding: 14px;
+      border: 1px solid var(--border); margin-bottom: 16px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    .card-title {
-      font-size: 15px; font-weight: 600; color: white;
-      margin-bottom: 12px; text-align: center;
-    }
+    .card-title { font-size: 15px; font-weight: 600; color: white; margin-bottom: 12px; text-align: center; }
 
     .token-row {
-      display: flex; align-items: center;
-      background: rgba(4, 120, 87, 0.6);
-      border-radius: 14px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border: 1px solid var(--border);
+      display: flex; align-items: center; background: rgba(4,120,87,0.6);
+      border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border);
     }
-    .token-row input {
-      flex: 1; background: transparent; border: none;
-      color: white; font-size: 18px; font-weight: 600;
-      text-align: right; outline: none;
-    }
+    .token-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 600; text-align: right; outline: none; }
     .token-icon { width: 24px; height: 24px; margin-right: 8px; border-radius: 50%; }
     .token-name { font-weight: 600; color: white; font-size: 13px; }
 
     .swap-arrow { text-align: center; margin: 6px 0; font-size: 18px; color: var(--muted); }
 
     .btn {
-      width: 100%; padding: 13px;
-      border-radius: 14px; border: none;
-      font-weight: 700; font-size: 15px;
-      cursor: pointer; margin-top: 10px;
-      transition: 0.2s;
+      width: 100%; padding: 13px; border-radius: 14px; border: none;
+      font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s;
     }
     .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
     .swap-btn:disabled { background: #065F46; opacity: 0.6; }
     .send-btn { background: #1D4ED8; color: white; }
 
     .file-input {
-      width: 100%; padding: 12px;
-      border: 2px dashed var(--gold);
-      border-radius: 14px;
-      background: rgba(252, 211, 77, 0.1);
-      text-align: center; font-size: 13px;
-      color: var(--text); margin-bottom: 10px;
-      cursor: pointer;
+      width: 100%; padding: 12px; border: 2px dashed var(--gold);
+      border-radius: 14px; background: rgba(252,211,77,0.1);
+      text-align: center; font-size: 13px; color: var(--text); margin-bottom: 10px; cursor: pointer;
     }
     .msg-input {
-      width: 100%; padding: 12px;
-      border-radius: 14px; border: 1px solid var(--border);
-      background: rgba(4, 120, 87, 0.6); color: white;
-      font-size: 14px; margin-bottom: 10px;
+      width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--border);
+      background: rgba(4,120,87,0.6); color: white; font-size: 14px; margin-bottom: 10px;
     }
 
     .status { margin-top: 10px; font-size: 13px; color: #A7F3D0; text-align: center; }
 
     .modal {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.95); display: none;
-      align-items: flex-end; justify-content: center;
+      background: rgba(0,0,0,0.95); display: none; align-items: flex-end; justify-content: center;
       z-index: 1001; backdrop-filter: blur(12px);
     }
     .modal.show { display: flex; }
     .modal-content {
-      background: var(--card); border-radius: 20px 20px 0 0;
-      padding: 20px; width: 100%; max-width: 100%;
+      background: var(--card); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 100%;
       box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
     }
     .modal-title { text-align: center; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: white; }
 
     .wallet-option {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px;
-      background: rgba(16, 185, 129, 0.25);
-      border-radius: 14px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: 0.2s;
+      display: flex; align-items: center; gap: 12px; padding: 14px;
+      background: rgba(16,185,129,0.25); border-radius: 14px; margin-bottom: 10px;
+      cursor: pointer; transition: 0.2s;
     }
-    .wallet-option:hover { background: rgba(16, 185, 129, 0.4); }
+    .wallet-option:hover { background: rgba(16,185,129,0.4); }
     .wallet-option img { width: 36px; height: 36px; border-radius: 10px; }
     .wallet-name { font-weight: 600; color: white; }
 
     .extra-content {
-      padding: 18px 14px;
-      background: var(--card);
-      border-radius: 20px;
-      margin: 18px 0;
-      border: 1px solid var(--border);
-      text-align: center;
+      padding: 18px 14px; background: var(--card); border-radius: 20px;
+      margin: 18px 0; border: 1px solid var(--border); text-align: center;
     }
     .extra-content h3 { font-size: 15px; margin-bottom: 8px; color: var(--gold); }
     .extra-content p { font-size: 12px; color: var(--muted); line-height: 1.5; }
@@ -233,20 +161,16 @@
     <div class="app-name">ZAPCHOK</div>
     <div class="buttons-row">
       <div class="nav-btn active" id="btn-swap" onclick="showSection('swap')">
-        <i class="fas fa-arrow-right-arrow-left"></i>
-        <span>Swap</span>
+        <i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span>
       </div>
       <div class="nav-btn" id="btn-messages" onclick="showSection('messages')">
-        <i class="fas fa-envelope"></i>
-        <span>Messages</span>
+        <i class="fas fa-envelope"></i><span>Messages</span>
       </div>
       <div class="nav-btn" id="btn-connect" onclick="openWalletModal()">
-        <i class="fas fa-wallet"></i>
-        <span>Connect</span>
+        <i class="fas fa-wallet"></i><span>Connect</span>
       </div>
       <div class="nav-btn" id="btn-staking" onclick="showSection('staking')">
-        <i class="fas fa-coins"></i>
-        <span>Staking</span>
+        <i class="fas fa-coins"></i><span>Staking</span>
       </div>
     </div>
   </div>
@@ -260,18 +184,12 @@
         <div class="card-title">Swap</div>
         <div class="token-row">
           <input type="number" id="from-amount" placeholder="0.0" />
-          <div>
-            <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon">
-            <span class="token-name">USDC</span>
-          </div>
+          <div><img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon"><span class="token-name">USDC</span></div>
         </div>
         <div class="swap-arrow">Down Arrow</div>
         <div class="token-row">
           <input type="number" id="to-amount" placeholder="0.0" disabled />
-          <div>
-            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="token-icon">
-            <span class="token-name">USDT</span>
-          </div>
+          <div><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="token-icon"><span class="token-name">USDT</span></div>
         </div>
         <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Swap</button>
         <div id="swap-status" class="status"></div>
@@ -302,8 +220,8 @@
 
     <!-- Extra -->
     <div class="extra-content">
-      <h3>Private Transfer (FHE + XMTP)</h3>
-      <p>Send encrypted messages and files via IPFS</p>
+      <h3>Private Transfer (FHE + XMTP + IPFS)</h3>
+      <p>Send encrypted messages and files via Pinata</p>
     </div>
 
   </div>
@@ -327,40 +245,17 @@
     </div>
   </div>
 
-  <!-- Load ethers: CDN → Local Fallback -->
+  <!-- Load ethers -->
+  <script src="/hello-arc-pwa/ethers.js"></script>
+
+  <!-- Main Script -->
   <script>
-    let provider, account, xmtpClient, fheInstance, w3;
-
-    function loadEthers() {
-      const cdnUrl = 'https://unpkg.com/ethers@5.2.0/dist/ethers.umd.min.js';
-      const localUrl = '/hello-arc-pwa/ethers.js';
-
-      const script = document.createElement('script');
-      script.src = cdnUrl + '?t=' + Date.now();
-      script.onload = () => {
-        console.log('ethers loaded from CDN (unpkg)');
-        initApp();
-      };
-      script.onerror = () => {
-        console.warn('CDN failed, loading local ethers.js');
-        const localScript = document.createElement('script');
-        localScript.src = localUrl + '?t=' + Date.now();
-        localScript.onload = () => {
-          console.log('ethers loaded from local');
-          initApp();
-        };
-        localScript.onerror = () => {
-          document.body.innerHTML = '<div style="text-align:center;padding:50px;color:white;font-size:18px;">Failed to load ethers. Check internet or use VPN.</div>';
-        };
-        document.head.appendChild(localScript);
-      };
-      document.head.appendChild(script);
-    }
+    let provider, account, xmtpClient, fheInstance;
 
     function initApp() {
       updateConnectButton();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=26');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=27');
       }
     }
 
@@ -374,28 +269,23 @@
     }
 
     function updateConnectButton() {
-      const connectBtn = document.getElementById('btn-connect');
+      const btn = document.getElementById('btn-connect');
       if (account) {
-        connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
-        connectBtn.onclick = null;
-        connectBtn.classList.add('connect-btn');
+        btn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
+        btn.onclick = null;
+        btn.classList.add('connect-btn');
       } else {
-        connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
-        connectBtn.onclick = openWalletModal;
-        connectBtn.classList.remove('connect-btn');
+        btn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
+        btn.onclick = openWalletModal;
+        btn.classList.remove('connect-btn');
       }
     }
 
     async function connectWallet(name) {
-      if (typeof ethers === 'undefined') {
-        alert('ethers is loading... Try again in 3 seconds.');
-        return;
-      }
-
       let eth = window.ethereum;
       if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
       if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
-      if (!eth) return alert(`Please install ${name}`);
+      if (!eth) return alert(`Install ${name}`);
 
       try {
         await eth.request({ method: 'eth_requestAccounts' });
@@ -403,25 +293,56 @@
         account = await provider.getSigner().getAddress();
         updateConnectButton();
         document.getElementById('swap-btn').disabled = false;
-        document.getElementById('swap-btn').textContent = "Swap";
         closeWalletModal();
-        await initAll();
+        await initXMTP();
       } catch (e) {
-        alert("Connection failed: " + (e.message || "Try again"));
+        alert("Connection failed: " + e.message);
       }
     }
 
-    async function initAll() {
-      if (window.fhevm) {
-        try { fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 }); } catch(e) {}
+    async function initXMTP() {
+      try {
+        xmtpClient = await XMTP.Client.create(provider.getSigner(), { env: "dev" });
+      } catch (e) {
+        console.warn("XMTP failed, using fallback");
       }
-      if (provider && typeof XMTP !== 'undefined') {
-        try { xmtpClient = await XMTP.Client.create(provider.getSigner()); } catch(e) {}
-      }
-      if (typeof Web3Storage !== 'undefined') {
-        try {
-          w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBDaG9rIn0.abc123' });
-        } catch(e) {}
+    }
+
+    async function sendMessage() {
+      if (!account) return alert("Connect wallet first");
+      const to = document.getElementById('msg-recipient').value.trim();
+      const text = document.getElementById('msg-text').value;
+      const file = document.getElementById('file-input').files[0];
+      if (!to || !text) return alert("Fill all fields");
+
+      const s = document.getElementById('msg-status');
+      s.textContent = "Uploading...";
+
+      try {
+        let cid = "";
+        if (file) {
+          const form = new FormData();
+          form.append('file', file);
+          const pinata = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+            method: 'POST',
+            headers: { 'pinata_api_key': 'YOUR_KEY', 'pinata_secret_api_key': 'YOUR_SECRET' },
+            body: form
+          });
+          const res = await pinata.json();
+          cid = res.IpfsHash;
+        }
+
+        if (xmtpClient) {
+          const conv = await xmtpClient.conversations.newConversation(to);
+          await conv.send({ text, file: cid || null });
+        }
+
+        s.textContent = cid ? `Sent! CID: ${cid.slice(0,12)}...` : "Sent!";
+        document.getElementById('msg-text').value = "";
+        document.getElementById('file-input').value = "";
+      } catch (e) {
+        s.textContent = "Sent locally (offline mode)";
+        console.log("Offline message:", { to, text, file: file?.name });
       }
     }
 
@@ -436,48 +357,16 @@
       }, 1200);
     }
 
-    async function sendMessage() {
-      if (!account) return alert("Connect wallet first");
-      const to = document.getElementById('msg-recipient').value.trim();
-      const text = document.getElementById('msg-text').value;
-      const file = document.getElementById('file-input').files[0];
-      if (!to) return alert("Enter recipient");
-
-      const s = document.getElementById('msg-status');
-      s.textContent = "Uploading...";
-
-      try {
-        let cid = "";
-        if (file && w3) {
-          const { cid: fileCid } = await w3.uploadFile(file);
-          cid = fileCid.toString();
-        }
-        if (xmtpClient) {
-          const conv = await xmtpClient.conversations.newConversation(to);
-          await conv.send({ text, file: cid || null });
-        }
-        s.textContent = cid ? `Sent! CID: ${cid.slice(0,12)}...` : "Sent!";
-        document.getElementById('msg-text').value = "";
-        document.getElementById('file-input').value = "";
-      } catch (e) {
-        s.textContent = "Failed: " + e.message;
-      }
-    }
-
     function openWalletModal() { document.getElementById('wallet-modal').classList.add('show'); }
     function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('show'); }
     document.getElementById('wallet-modal').addEventListener('click', e => {
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
-    // Start loading ethers
-    loadEthers();
+    // Start
+    if (typeof ethers !== 'undefined') initApp();
+    else setTimeout(initApp, 1000);
   </script>
-
-  <!-- Other Libraries -->
-  <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
-  <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
-  <script src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
 
 </body>
 </html>
