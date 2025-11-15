@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=23" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=24" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -15,12 +15,6 @@
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <!-- Libraries with defer -->
-  <script defer src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-  <script defer src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
-  <script defer src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
-  <script defer src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
 
   <style>
     :root {
@@ -333,16 +327,31 @@
     </div>
   </div>
 
-  <!-- Main Script: Wait for ethers -->
+  <!-- Load ethers with onload + fallback -->
   <script>
+    // Global variables
     let provider, account, xmtpClient, fheInstance, w3;
 
-    // Wait for ethers to load
-    function waitForEthers(callback) {
-      if (typeof ethers !== 'undefined') {
-        callback();
-      } else {
-        setTimeout(() => waitForEthers(callback), 100);
+    // Load ethers safely
+    function loadEthers() {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.ethers.io/lib/ethers-5.2.umd.min.js';
+      script.onload = function() {
+        console.log('ethers loaded');
+        initApp();
+      };
+      script.onerror = function() {
+        alert('Failed to load ethers library. Check internet or use VPN.');
+      };
+      document.head.appendChild(script);
+    }
+
+    function initApp() {
+      // Now ethers is guaranteed to be loaded
+      updateConnectButton();
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=24');
       }
     }
 
@@ -369,6 +378,11 @@
     }
 
     async function connectWallet(name) {
+      if (typeof ethers === 'undefined') {
+        alert('ethers not loaded yet. Try again in 2 seconds.');
+        return;
+      }
+
       let eth = window.ethereum;
       if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
       if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
@@ -384,16 +398,22 @@
         closeWalletModal();
         await initAll();
       } catch (e) {
-        alert("Connection failed: " + e.message);
+        alert("Connection failed: " + (e.message || "Unknown error"));
       }
     }
 
     async function initAll() {
-      if (window.fhevm) fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 });
-      if (provider) xmtpClient = await XMTP.Client.create(provider.getSigner());
-      try {
-        w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBDaG9rIn0.abc123' });
-      } catch (e) {}
+      if (window.fhevm && typeof fhevm !== 'undefined') {
+        try { fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 }); } catch(e) {}
+      }
+      if (provider && typeof XMTP !== 'undefined') {
+        try { xmtpClient = await XMTP.Client.create(provider.getSigner()); } catch(e) {}
+      }
+      if (typeof Web3Storage !== 'undefined') {
+        try {
+          w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBDaG9rIn0.abc123' });
+        } catch(e) {}
+      }
     }
 
     async function swapTokens() {
@@ -441,13 +461,14 @@
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
-    // Start after ethers loads
-    waitForEthers(() => {
-      updateConnectButton();
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=23');
-      }
-    });
+    // Start loading ethers
+    loadEthers();
   </script>
+
+  <!-- Load other libraries after ethers -->
+  <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
+  <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
+  <script src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
+
 </body>
 </html>
