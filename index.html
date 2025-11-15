@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=24" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=25" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -317,7 +317,7 @@
         <span class="wallet-name">MetaMask</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('okx')">
-        <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
+        <img src="https://static.okx.com/cdn/assets/imgs/221/2218C1D4B9D2B8D3C2F.png" alt="OKX">
         <span class="wallet-name">OKX Wallet</span>
       </div>
       <div class="wallet-option" onclick="connectWallet('phantom')">
@@ -327,31 +327,40 @@
     </div>
   </div>
 
-  <!-- Load ethers with onload + fallback -->
+  <!-- Load ethers from CDN with fallback to local -->
   <script>
-    // Global variables
     let provider, account, xmtpClient, fheInstance, w3;
 
-    // Load ethers safely
     function loadEthers() {
+      const cdnUrl = 'https://cdn.ethers.io/lib/ethers-5.2.umd.min.js';
+      const localUrl = '/hello-arc-pwa/ethers.js';
+
       const script = document.createElement('script');
-      script.src = 'https://cdn.ethers.io/lib/ethers-5.2.umd.min.js';
-      script.onload = function() {
-        console.log('ethers loaded');
+      script.src = cdnUrl;
+      script.onload = () => {
+        console.log('ethers loaded from CDN');
         initApp();
       };
-      script.onerror = function() {
-        alert('Failed to load ethers library. Check internet or use VPN.');
+      script.onerror = () => {
+        console.warn('CDN failed, loading local ethers.js');
+        const localScript = document.createElement('script');
+        localScript.src = localUrl + '?v=' + Date.now();
+        localScript.onload = () => {
+          console.log('ethers loaded from local');
+          initApp();
+        };
+        localScript.onerror = () => {
+          alert('Failed to load ethers. Check your internet or use VPN.');
+        };
+        document.head.appendChild(localScript);
       };
       document.head.appendChild(script);
     }
 
     function initApp() {
-      // Now ethers is guaranteed to be loaded
       updateConnectButton();
-
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=24');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=25');
       }
     }
 
@@ -379,7 +388,7 @@
 
     async function connectWallet(name) {
       if (typeof ethers === 'undefined') {
-        alert('ethers not loaded yet. Try again in 2 seconds.');
+        alert('ethers is loading... Try again in 3 seconds.');
         return;
       }
 
@@ -398,12 +407,12 @@
         closeWalletModal();
         await initAll();
       } catch (e) {
-        alert("Connection failed: " + (e.message || "Unknown error"));
+        alert("Connection failed: " + (e.message || "Try again"));
       }
     }
 
     async function initAll() {
-      if (window.fhevm && typeof fhevm !== 'undefined') {
+      if (window.fhevm) {
         try { fheInstance = await fhevm.createInstance({ network: "testnet", chainId: 12345 }); } catch(e) {}
       }
       if (provider && typeof XMTP !== 'undefined') {
@@ -432,7 +441,7 @@
       const to = document.getElementById('msg-recipient').value.trim();
       const text = document.getElementById('msg-text').value;
       const file = document.getElementById('file-input').files[0];
-      if (!to) return alert("Enter recipient address");
+      if (!to) return alert("Enter recipient");
 
       const s = document.getElementById('msg-status');
       s.textContent = "Uploading...";
@@ -461,11 +470,11 @@
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
-    // Start loading ethers
+    // Start
     loadEthers();
   </script>
 
-  <!-- Load other libraries after ethers -->
+  <!-- Other libraries -->
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
   <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
   <script src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
