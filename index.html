@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=22" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=23" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -16,17 +16,16 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Libraries -->
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-  <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
-  <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
-  <script src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
+  <!-- Libraries with defer -->
+  <script defer src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  <script defer src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
+  <script defer src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
+  <script defer src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
 
   <style>
     :root {
       --green: #10B981;
       --green-dark: #059669;
-      --green-light: #34D399;
       --gold: #FCD34D;
       --dark: #064E3B;
       --card: #065F46;
@@ -118,8 +117,7 @@
       min-height: 100vh;
     }
 
-    /* Swap Card - Smaller & Mobile-Friendly */
-    .swap-card {
+    .swap-card, .msg-card {
       background: var(--card);
       border-radius: 20px;
       padding: 14px;
@@ -133,7 +131,6 @@
       margin-bottom: 12px; text-align: center;
     }
 
-    /* Token Row - Compact */
     .token-row {
       display: flex; align-items: center;
       background: rgba(4, 120, 87, 0.6);
@@ -150,32 +147,18 @@
     .token-icon { width: 24px; height: 24px; margin-right: 8px; border-radius: 50%; }
     .token-name { font-weight: 600; color: white; font-size: 13px; }
 
-    .swap-arrow {
-      text-align: center; margin: 6px 0; font-size: 18px; color: var(--muted);
-    }
+    .swap-arrow { text-align: center; margin: 6px 0; font-size: 18px; color: var(--muted); }
 
-    /* Swap Button - Smaller */
-    .swap-btn {
+    .btn {
       width: 100%; padding: 13px;
       border-radius: 14px; border: none;
       font-weight: 700; font-size: 15px;
       cursor: pointer; margin-top: 10px;
-      background: linear-gradient(90deg, #10B981, #34D399); color: white;
       transition: 0.2s;
     }
+    .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
     .swap-btn:disabled { background: #065F46; opacity: 0.6; }
-
-    .status { margin-top: 10px; font-size: 13px; color: #A7F3D0; text-align: center; }
-
-    /* Messages & Staking - Compact */
-    .msg-card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 16px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
+    .send-btn { background: #1D4ED8; color: white; }
 
     .file-input {
       width: 100%; padding: 12px;
@@ -193,15 +176,8 @@
       font-size: 14px; margin-bottom: 10px;
     }
 
-    .send-btn {
-      width: 100%; padding: 13px;
-      border-radius: 14px; border: none;
-      font-weight: 700; font-size: 15px;
-      cursor: pointer;
-      background: #1D4ED8; color: white;
-    }
+    .status { margin-top: 10px; font-size: 13px; color: #A7F3D0; text-align: center; }
 
-    /* Modal */
     .modal {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.95); display: none;
@@ -251,7 +227,7 @@
       .token-row input { font-size: 17px; }
       .token-icon { width: 22px; height: 22px; }
       .token-name { font-size: 12px; }
-      .swap-btn, .send-btn { padding: 12px; font-size: 14px; }
+      .btn { padding: 12px; font-size: 14px; }
       .modal-content { padding: 18px; }
     }
   </style>
@@ -284,7 +260,7 @@
   <!-- Main -->
   <div class="main">
 
-    <!-- Swap - Compact -->
+    <!-- Swap -->
     <div id="swap-section">
       <div class="swap-card">
         <div class="card-title">Swap</div>
@@ -303,7 +279,7 @@
             <span class="token-name">USDT</span>
           </div>
         </div>
-        <button class="swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Swap</button>
+        <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Swap</button>
         <div id="swap-status" class="status"></div>
       </div>
     </div>
@@ -315,7 +291,7 @@
         <input type="file" id="file-input" class="file-input">
         <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
         <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="3"></textarea>
-        <button class="send-btn" onclick="sendMessage()">Send</button>
+        <button class="btn send-btn" onclick="sendMessage()">Send</button>
         <div id="msg-status" class="status"></div>
       </div>
     </div>
@@ -325,7 +301,7 @@
       <div class="msg-card">
         <div class="card-title">Stake USDC</div>
         <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:12px;">
-        <button class="swap-btn" style="background:var(--gold);color:#064E3B;">Stake</button>
+        <button class="btn" style="background:var(--gold);color:#064E3B;">Stake</button>
         <div class="status" style="color:var(--muted);margin-top:8px;">APY: <strong style="color:var(--gold);">12.5%</strong></div>
       </div>
     </div>
@@ -357,8 +333,18 @@
     </div>
   </div>
 
+  <!-- Main Script: Wait for ethers -->
   <script>
     let provider, account, xmtpClient, fheInstance, w3;
+
+    // Wait for ethers to load
+    function waitForEthers(callback) {
+      if (typeof ethers !== 'undefined') {
+        callback();
+      } else {
+        setTimeout(() => waitForEthers(callback), 100);
+      }
+    }
 
     function showSection(section) {
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -386,7 +372,7 @@
       let eth = window.ethereum;
       if (name === 'okx' && window.okxwallet) eth = window.okxwallet;
       if (name === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
-      if (!eth) return alert(`Install ${name}`);
+      if (!eth) return alert(`Please install ${name}`);
 
       try {
         await eth.request({ method: 'eth_requestAccounts' });
@@ -397,7 +383,9 @@
         document.getElementById('swap-btn').textContent = "Swap";
         closeWalletModal();
         await initAll();
-      } catch(e) { alert(e.message); }
+      } catch (e) {
+        alert("Connection failed: " + e.message);
+      }
     }
 
     async function initAll() {
@@ -405,7 +393,7 @@
       if (provider) xmtpClient = await XMTP.Client.create(provider.getSigner());
       try {
         w3 = await Web3Storage.create({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDREMjY0MzhEMzYxM0U0Nzk0M0E1RTY2MjYxODU1ODU4RjI2NTc0ODciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE3MDc0NTM0ODAwMDAsIm5hbWUiOiJaYXBDaG9rIn0.abc123' });
-      } catch(e) {}
+      } catch (e) {}
     }
 
     async function swapTokens() {
@@ -420,11 +408,11 @@
     }
 
     async function sendMessage() {
-      if (!account) return alert("Connect wallet");
+      if (!account) return alert("Connect wallet first");
       const to = document.getElementById('msg-recipient').value.trim();
       const text = document.getElementById('msg-text').value;
       const file = document.getElementById('file-input').files[0];
-      if (!to) return alert("Enter recipient");
+      if (!to) return alert("Enter recipient address");
 
       const s = document.getElementById('msg-status');
       s.textContent = "Uploading...";
@@ -442,8 +430,8 @@
         s.textContent = cid ? `Sent! CID: ${cid.slice(0,12)}...` : "Sent!";
         document.getElementById('msg-text').value = "";
         document.getElementById('file-input').value = "";
-      } catch(e) {
-        s.textContent = "Failed";
+      } catch (e) {
+        s.textContent = "Failed: " + e.message;
       }
     }
 
@@ -453,11 +441,13 @@
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
-    updateConnectButton();
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=22');
-    }
+    // Start after ethers loads
+    waitForEthers(() => {
+      updateConnectButton();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=23');
+      }
+    });
   </script>
 </body>
 </html>
