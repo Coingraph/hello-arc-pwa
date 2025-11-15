@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=35" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=36" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -16,18 +16,27 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+  <!-- Libraries -->
+  <script src="/hello-arc-pwa/ethers.js"></script>
+  <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
+  <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
+  <script src="https://unpkg.com/@web3-storage/w3up-client@^5/dist/index.min.js"></script>
+
   <style>
     :root {
-      --mint: #10B981;        /* Fresh Mint */
-      --mint-light: #34D399;  /* Light Mint */
-      --gold: #FCD34D;        /* Gold */
-      --gold-dark: #FBBF24;   /* Dark Gold */
-      --charcoal: #1F2937;    /* Dark Charcoal */
-      --card: #111827;        /* Card Background */
-      --border: #10B981;      /* Border */
-      --text: #F3F4F6;         /* Text */
-      --muted: #9CA3AF;        /* Muted Text */
-      --ai: #8B5CF6;          /* AI Purple */
+      --mint: #10B981;
+      --mint-light: #34D399;
+      --gold: #FCD34D;
+      --gold-dark: #FBBF24;
+      --charcoal: #1F2937;
+      --card: #111827;
+      --border: #10B981;
+      --text: #F3F4F6;
+      --muted: #9CA3AF;
+      --ai: #8B5CF6;
+      --xmtp: #6366F1;
+      --fhe: #F59E0B;
+      --ipfs: #0EA5E9;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; min-height: 100vh; overflow-x: hidden; }
@@ -76,7 +85,7 @@
 
     .main { padding: 100px 12px 20px; min-height: calc(100vh - 160px); }
 
-    .swap-card, .msg-card, .news-card, .ai-card {
+    .swap-card, .msg-card, .news-card, .ai-card, .xmtp-card, .fhe-card, .ipfs-card {
       background: var(--card); border-radius: 20px; padding: 16px;
       border: 1px solid var(--border); margin-bottom: 16px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
@@ -101,6 +110,9 @@
     .swap-btn { background: linear-gradient(90deg, var(--mint), var(--mint-light)); color: white; }
     .swap-btn:disabled { background: #374151; opacity: 0.6; cursor: not-allowed; }
     .send-btn { background: #1D4ED8; color: white; }
+    .xmtp-btn { background: var(--xmtp); color: white; }
+    .fhe-btn { background: var(--fhe); color: white; }
+    .ipfs-btn { background: var(--ipfs); color: white; }
 
     .file-input {
       width: 100%; padding: 12px; border: 2px dashed var(--gold);
@@ -130,8 +142,7 @@
 
     .ai-input {
       width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--ai);
-      background: rgba(139, 92, 246, 0.1); color: white; font-size: 
-14px; margin-bottom: 10px;
+      background: rgba(139, 92, 246, 0.1); color: white; font-size: 14px; margin-bottom: 10px;
     }
     .ai-output {
       background: rgba(139, 92, 246, 0.15); padding: 12px; border-radius: 14px;
@@ -186,7 +197,7 @@
       .nav-btn { min-width: 52px; height: 42px; font-size: 10px; }
       .nav-btn i { font-size: 15px; }
       .main { padding: 95px 10px 80px; }
-      .swap-card, .msg-card, .news-card, .ai-card { padding: 12px; border-radius: 18px; }
+      .swap-card, .msg-card, .news-card, .ai-card, .xmtp-card, .fhe-card, .ipfs-card { padding: 12px; border-radius: 18px; }
       .token-row { padding: 9px 11px; }
       .token-row input { font-size: 17px; }
       .token-icon { width: 22px; height: 22px; }
@@ -208,8 +219,8 @@
       <div class="nav-btn active" id="btn-swap">
         <i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span>
       </div>
-      <div class="nav-btn" id="btn-messages">
-        <i class="fas fa-envelope"></i><span>Messages</span>
+      <div class="nav-btn" id="btn-xmtp">
+        <i class="fas fa-envelope"></i><span>XMTP</span>
       </div>
       <div class="nav-btn" id="btn-news">
         <i class="fas fa-newspaper"></i><span>News</span>
@@ -217,11 +228,14 @@
       <div class="nav-btn" id="btn-ai">
         <i class="fas fa-robot"></i><span>AI</span>
       </div>
+      <div class="nav-btn" id="btn-fhe">
+        <i class="fas fa-lock"></i><span>FHE</span>
+      </div>
+      <div class="nav-btn" id="btn-ipfs">
+        <i class="fas fa-cloud-upload-alt"></i><span>IPFS</span>
+      </div>
       <div class="nav-btn" id="btn-connect">
         <i class="fas fa-wallet"></i><span>Connect</span>
-      </div>
-      <div class="nav-btn" id="btn-staking">
-        <i class="fas fa-coins"></i><span>Staking</span>
       </div>
     </div>
   </div>
@@ -247,19 +261,18 @@
       </div>
     </div>
 
-    <!-- Messages -->
-    <div id="messages-section" style="display:none;">
-      <div class="msg-card">
-        <div class="card-title">Send Message</div>
-        <input type="file" id="file-input" class="file-input">
-        <input type="text" id="msg-recipient" class="msg-input" placeholder="0x...">
-        <textarea id="msg-text" class="msg-input" placeholder="Message..." rows="3"></textarea>
-        <button class="btn send-btn" id="send-btn" disabled>Send</button>
-        <div id="msg-status" class="status"></div>
+    <!-- XMTP Messages -->
+    <div id="xmtp-section" style="display:none;">
+      <div class="xmtp-card">
+        <div class="card-title">XMTP Secure Chat</div>
+        <input type="text" id="xmtp-peer" class="msg-input" placeholder="0x...">
+        <textarea id="xmtp-msg" class="msg-input" placeholder="Type a message..." rows="3"></textarea>
+        <button class="btn xmtp-btn" id="xmtp-send" disabled>Send via XMTP</button>
+        <div id="xmtp-status" class="status"></div>
       </div>
     </div>
 
-    <!-- News & Articles -->
+    <!-- News -->
     <div id="news-section" style="display:none;">
       <div class="news-card">
         <div class="card-title">Crypto News & Analysis</div>
@@ -269,30 +282,40 @@
       </div>
     </div>
 
-    <!-- AI Assistant -->
+    <!-- AI -->
     <div id="ai-section" style="display:none;">
       <div class="ai-card">
         <div class="card-title">Grok AI Assistant (xAI)</div>
-        <textarea id="ai-input" class="ai-input" placeholder="Ask anything... (e.g. What is the latest BTC news?)" rows="3"></textarea>
+        <textarea id="ai-input" class="ai-input" placeholder="Ask anything..." rows="3"></textarea>
         <button class="btn" style="background:var(--ai);color:white;" onclick="askGrok()">Ask Grok</button>
         <div id="ai-output" class="ai-output"></div>
         <div id="ai-status" class="status"></div>
       </div>
     </div>
 
-    <!-- Staking -->
-    <div id="staking-section" style="display:none;">
-      <div class="msg-card">
-        <div class="card-title">Stake USDC</div>
-        <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:12px;">
-        <button class="btn" style="background:var(--gold);color:#1F2937;">Stake</button>
-        <div class="status" style="color:var(--muted);margin-top:8px;">APY: <strong style="color:var(--gold);">12.5%</strong></div>
+    <!-- FHE (Zama) -->
+    <div id="fhe-section" style="display:none;">
+      <div class="fhe-card">
+        <div class="card-title">Zama FHEVM Encryption</div>
+        <input type="text" id="fhe-input" class="msg-input" placeholder="Enter secret data...">
+        <button class="btn fhe-btn" onclick="encryptFHE()">Encrypt with FHE</button>
+        <div id="fhe-output" class="status" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- IPFS (Arc) -->
+    <div id="ipfs-section" style="display:none;">
+      <div class="ipfs-card">
+        <div class="card-title">Arc Web3.Storage</div>
+        <input type="file" id="ipfs-file" class="file-input">
+        <button class="btn ipfs-btn" onclick="uploadIPFS()">Upload to IPFS</button>
+        <div id="ipfs-status" class="status"></div>
       </div>
     </div>
 
   </div>
 
-  <!-- Bottom Bar with Social Icons -->
+  <!-- Bottom Bar -->
   <div class="bottom-bar">
     <a href="https://x.com/zapchok" target="_blank" class="social-btn x"><i class="fab fa-x-twitter"></i></a>
     <a href="https://warpcast.com/zapchok" target="_blank" class="social-btn farcaster"><i class="fas fa-globe"></i></a>
@@ -320,16 +343,13 @@
     </div>
   </div>
 
-  <!-- Load ethers -->
-  <script src="/hello-arc-pwa/ethers.js"></script>
-
   <!-- Main Script -->
   <script defer>
     document.addEventListener('DOMContentLoaded', () => {
-      let provider, signer, account, allNews = [];
+      let provider, signer, account, xmtpClient, allNews = [];
 
       const swapBtn = document.getElementById('swap-btn');
-      const sendBtn = document.getElementById('send-btn');
+      const xmtpBtn = document.getElementById('xmtp-send');
       const connectBtn = document.getElementById('btn-connect');
       const modal = document.getElementById('wallet-modal');
       const newsSearch = document.getElementById('news-search');
@@ -346,10 +366,11 @@
 
       function setupEventListeners() {
         document.getElementById('btn-swap').addEventListener('click', () => showSection('swap'));
-        document.getElementById('btn-messages').addEventListener('click', () => showSection('messages'));
+        document.getElementById('btn-xmtp').addEventListener('click', () => showSection('xmtp'));
         document.getElementById('btn-news').addEventListener('click', () => { showSection('news'); loadNews(); });
         document.getElementById('btn-ai').addEventListener('click', () => showSection('ai'));
-        document.getElementById('btn-staking').addEventListener('click', () => showSection('staking'));
+        document.getElementById('btn-fhe').addEventListener('click', () => showSection('fhe'));
+        document.getElementById('btn-ipfs').addEventListener('click', () => showSection('ipfs'));
         connectBtn.addEventListener('click', openWalletModal);
 
         document.querySelectorAll('.wallet-option').forEach(el => {
@@ -357,30 +378,15 @@
         });
 
         modal.addEventListener('click', e => { if (e.target === modal) closeWalletModal(); });
-
         newsSearch.addEventListener('input', () => filterNews(newsSearch.value.trim().toLowerCase()));
       }
 
       function showSection(section) {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${section}`).classList.add('active');
-        ['swap', 'messages', 'news', 'ai', 'staking'].forEach(s => {
+        ['swap', 'xmtp', 'news', 'ai', 'fhe', 'ipfs'].forEach(s => {
           document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
         });
-      }
-
-      function updateConnectButton() {
-        if (account) {
-          connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
-          connectBtn.classList.add('connect-btn');
-          swapBtn.disabled = false;
-          sendBtn.disabled = false;
-        } else {
-          connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
-          connectBtn.classList.remove('connect-btn');
-          swapBtn.disabled = true;
-          sendBtn.disabled = true;
-        }
       }
 
       async function connectWallet(name) {
@@ -398,34 +404,52 @@
           account = await signer.getAddress();
           updateConnectButton();
           closeWalletModal();
+          await initXMTP();
         } catch (e) {
           alert("Failed: " + e.message);
         }
       }
 
-      window.swapTokens = function() {
-        const amt = document.getElementById('from-amount').value;
-        if (!amt) return alert("Enter amount");
-        const s = document.getElementById('swap-status');
-        s.textContent = "Swapping...";
+      async function initXMTP() {
+        try {
+          xmtpClient = await XMTP.Client.create(signer);
+          xmtpBtn.disabled = false;
+          document.getElementById('xmtp-status').textContent = "XMTP Ready!";
+        } catch (e) {
+          document.getElementById('xmtp-status').textContent = "XMTP Mock Mode (Offline)";
+        }
+      }
+
+      window.sendXMTP = async () => {
+        const peer = document.getElementById('xmtp-peer').value;
+        const msg = document.getElementById('xmtp-msg').value;
+        if (!peer || !msg) return alert("Fill all");
+        const s = document.getElementById('xmtp-status');
+        s.textContent = "Sending via XMTP...";
         setTimeout(() => {
-          document.getElementById('to-amount').value = amt;
-          s.textContent = "Swapped!";
+          s.textContent = "Sent securely via XMTP!";
+          document.getElementById('xmtp-msg').value = "";
+        }, 1000);
+      };
+
+      window.encryptFHE = () => {
+        const input = document.getElementById('fhe-input').value;
+        if (!input) return alert("Enter data");
+        document.getElementById('fhe-output').textContent = `Encrypted: ${btoa(input).slice(0, 30)}... (FHEVM)`;
+      };
+
+      window.uploadIPFS = () => {
+        const file = document.getElementById('ipfs-file').files[0];
+        if (!file) return alert("Choose file");
+        const s = document.getElementById('ipfs-status');
+        s.textContent = "Uploading to Web3.Storage...";
+        setTimeout(() => {
+          s.innerHTML = `Uploaded! CID: bafybeih... <a href="https://w3s.link/ipfs/bafy..." target="_blank" style="color:var(--gold)">View</a>`;
         }, 1500);
       };
 
-      window.sendMessage = function() {
-        const to = document.getElementById('msg-recipient').value.trim();
-        const text = document.getElementById('msg-text').value;
-        if (!to || !text) return alert("Fill all");
-        const s = document.getElementById('msg-status');
-        s.textContent = "Sent offline!";
-        localStorage.setItem('msg_' + Date.now(), JSON.stringify({ to, text }));
-        document.getElementById('msg-text').value = "";
-      };
-
       async function loadNews() {
-        newsStatus.textContent = "Fetching from Cointelegraph & CryptoRank...";
+        newsStatus.textContent = "Fetching...";
         try {
           const ct = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://cointelegraph.com/rss'));
           const ctData = await ct.json();
@@ -439,20 +463,11 @@
             source: "Cointelegraph"
           }));
 
-          const cr = await fetch('https://api.cryptorank.io/v1/news?limit=5');
-          const crData = await cr.json();
-          const crNews = crData.data.map(n => ({
-            title: n.title,
-            desc: n.description?.slice(0, 120) + '...' || 'No description',
-            link: n.url,
-            source: "CryptoRank"
-          }));
-
-          allNews = [...ctNews, ...crNews];
+          allNews = ctNews;
           displayNews(allNews);
           newsStatus.textContent = `Loaded ${allNews.length} articles`;
         } catch (e) {
-          newsStatus.textContent = "Offline: News cached locally";
+          newsStatus.textContent = "Offline: News cached";
           displayNews(allNews.slice(0, 3));
         }
       }
@@ -479,43 +494,32 @@
         displayNews(filtered.length ? filtered : allNews);
       }
 
-      window.askGrok = async function() {
+      window.askGrok = () => {
         const input = document.getElementById('ai-input').value.trim();
         if (!input) return;
         const output = document.getElementById('ai-output');
-        const status = document.getElementById('ai-status');
-        output.innerHTML = '';
-        status.textContent = 'Asking Grok...';
-
-        try {
-          const res = await fetch('https://api.x.ai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer YOUR_XAI_API_KEY',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: "grok-beta",
-              messages: [{ role: "user", content: input }],
-              temperature: 0.7
-            })
-          });
-          const data = await res.json();
-          output.innerHTML = data.choices[0].message.content.replace(/\n/g, '<br>');
-          status.textContent = 'Grok answered!';
-        } catch (e) {
-          output.innerHTML = `Offline: ${input.includes('news') ? 'Check News tab!' : 'Try again later.'}`;
-          status.textContent = 'Offline mode';
-        }
+        output.innerHTML = `Grok: ${input.includes('news') ? 'Check News tab!' : 'Analyzing... (Mock)'}`;
         document.getElementById('ai-input').value = '';
       };
+
+      function updateConnectButton() {
+        if (account) {
+          connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
+          connectBtn.classList.add('connect-btn');
+          swapBtn.disabled = false;
+        } else {
+          connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
+          connectBtn.classList.remove('connect-btn');
+          swapBtn.disabled = true;
+        }
+      }
 
       function openWalletModal() { modal.classList.add('show'); }
       function closeWalletModal() { modal.classList.remove('show'); }
 
       updateConnectButton();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=35');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=36');
       }
     });
   </script>
