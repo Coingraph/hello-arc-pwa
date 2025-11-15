@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=42" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=43" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -20,8 +20,6 @@
   <script src="/hello-arc-pwa/ethers.js"></script>
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
   <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
-  <!-- Xion SDK (Official from Burnt Labs) -->
-  <script src="https://unpkg.com/@burnt-labs/abstraxion@0.1.0/dist/index.umd.js"></script>
 
   <style>
     :root {
@@ -306,7 +304,7 @@
 
   <!-- Script -->
   <script defer>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
       let provider, signer, account, xmtpClient;
 
       const swapBtn = document.getElementById('swap-btn');
@@ -339,17 +337,16 @@
         else if (type === 'okx' && window.okxwallet) eth = window.okxwallet;
         else if (type === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
         else if (type === 'xion') {
-          try {
-            const { Abstraxion } = window.abstraxion;
-            const abstraxion = new Abstraxion();
-            const result = await abstraxion.connect();
-            account = result.address;
+          // Mock Xion (Google Login)
+          const email = prompt("Enter Google Email (for demo):");
+          if (email && email.includes('@')) {
+            account = "xion1" + Math.random().toString(36).substring(2, 15);
             updateConnectButton();
             closeWalletModal();
-            alert("Xion Connected: " + account.slice(0,10) + "...");
+            alert("Xion Connected (Mock): " + account);
             return;
-          } catch (e) {
-            alert("Xion Error: " + e.message);
+          } else {
+            alert("Invalid email");
             return;
           }
         }
@@ -427,7 +424,7 @@
       function closeWalletModal() { modal.classList.remove('show'); }
 
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=42');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=43');
       }
     });
   </script>
