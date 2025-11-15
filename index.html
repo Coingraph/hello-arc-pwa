@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=39" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=40" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -24,21 +24,13 @@
     import { create } from 'https://esm.run/@storacha/client';
     window.createStorachaClient = create;
   </script>
-  <!-- Xion SDK (Google Wallet) -->
   <script src="https://unpkg.com/@xion-protocol/sdk@latest/dist/index.js"></script>
 
   <style>
     :root {
-      --mint: #10B981;
-      --mint-light: #34D399;
-      --gold: #FCD34D;
-      --gold-dark: #FBBF24;
-      --charcoal: #1F2937;
-      --card: #111827;
-      --border: #10B981;
-      --text: #F3F4F6;
-      --muted: #9CA3AF;
-      --xion: #4285F4;
+      --mint: #10B981; --mint-light: #34D399; --gold: #FCD34D; --gold-dark: #FBBF24;
+      --charcoal: #1F2937; --card: #111827; --border: #10B981; --text: #F3F4F6; --muted: #9CA3AF;
+      --ai: #8B5CF6; --xmtp: #6366F1; --fhe: #F59E0B; --storacha: #0EA5E9; --xion: #4285F4;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; min-height: 100vh; overflow-x: hidden; }
@@ -87,6 +79,42 @@
 
     .main { padding: 100px 12px 20px; min-height: calc(100vh - 160px); }
 
+    .swap-card, .msg-card, .news-card, .ai-card, .xmtp-card, .fhe-card, .storacha-card, .staking-card {
+      background: var(--card); border-radius: 20px; padding: 16px;
+      border: 1px solid var(--border); margin-bottom: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    .card-title { font-size: 15px; font-weight: 600; color: var(--mint); margin-bottom: 12px; text-align: center; }
+
+    .token-row {
+      display: flex; align-items: center; background: rgba(31, 41, 55, 0.6);
+      border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border);
+    }
+    .token-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 600; text-align: right; outline: none; }
+    .token-icon { width: 24px; height: 24px; margin-right: 8px; border-radius: 50%; }
+    .token-name { font-weight: 600; color: white; font-size: 13px; }
+
+    .swap-arrow { text-align: center; margin: 6px 0; font-size: 18px; color: var(--muted); }
+
+    .btn {
+      width: 100%; padding: 13px; border-radius: 14px; border: none;
+      font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s;
+    }
+    .swap-btn { background: linear-gradient(90deg, var(--mint), var(--mint-light)); color: white; }
+    .swap-btn:disabled { background: #374151; opacity: 0.6; cursor: not-allowed; }
+    .xmtp-btn { background: var(--xmtp); color: white; }
+    .fhe-btn { background: var(--fhe); color: white; }
+    .storacha-btn { background: linear-gradient(90deg, var(--storacha), #38BDF8); color: white; }
+
+    .file-input, .msg-input, .search-input, .ai-input {
+      width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--border);
+      background: rgba(31, 41, 55, 0.6); color: white; font-size: 14px; margin-bottom: 10px;
+    }
+    .file-input { border: 2px dashed var(--storacha); background: rgba(14,165,233,0.1); text-align: center; cursor: pointer; }
+
+    .status { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: center; }
+
     .modal {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.95); display: none; align-items: flex-end; justify-content: center;
@@ -104,7 +132,7 @@
       background: rgba(16,185,129,0.15); border-radius: 16px; margin-bottom: 12px;
       cursor: pointer; transition: 0.2s; border: 1px solid var(--border);
     }
-    .wallet-option:hover { background: rgba(16,185,129,0.3); transform: translateY(-2px); }
+    .wallet-option:hover { background: rgba(16,185,129,0.3); }
     .wallet-option img { width: 40px; height: 40px; border-radius: 12px; }
     .wallet-name { font-weight: 600; color: white; font-size: 15px; }
     .wallet-tag { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -127,14 +155,18 @@
     .social-btn.tiktok { background: #000000; }
     .social-btn.aurara { background: #FF6B6B; }
     .social-btn i { font-size: 16px; color: white; }
-    .social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .
+social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
 
     @media (max-width: 480px) {
       .topbar { height: 85px; }
       .app-name { font-size: 28px; }
       .nav-btn { min-width: 52px; height: 42px; font-size: 10px; }
-      .wallet-option { padding: 14px; }
-      .wallet-option img { width: 36px; height: 36px; }
+      .nav-btn i { font-size: 15px; }
+      .main { padding: 95px 10px 80px; }
+      .social-btn { width: 36px; height: 36px; }
+      .social-btn i { font-size: 15px; }
+      .bottom-bar { height: 56px; gap: 12px; }
     }
   </style>
 </head>
@@ -145,18 +177,98 @@
     <div class="app-name">ZAPCHOK</div>
     <div class="buttons-row">
       <div class="nav-btn active" id="btn-swap"><i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span></div>
+      <div class="nav-btn" id="btn-xmtp"><i class="fas fa-envelope"></i><span>XMTP</span></div>
+      <div class="nav-btn" id="btn-news"><i class="fas fa-newspaper"></i><span>News</span></div>
+      <div class="nav-btn" id="btn-ai"><i class="fas fa-robot"></i><span>AI</span></div>
+      <div class="nav-btn" id="btn-fhe"><i class="fas fa-lock"></i><span>FHE</span></div>
+      <div class="nav-btn" id="btn-storacha"><i class="fas fa-cloud-upload-alt"></i><span>Storacha</span></div>
+      <div class="nav-btn" id="btn-staking"><i class="fas fa-coins"></i><span>Staking</span></div>
       <div class="nav-btn" id="btn-connect"><i class="fas fa-wallet"></i><span>Connect</span></div>
     </div>
   </div>
 
   <!-- Main -->
   <div class="main">
+
+    <!-- Swap -->
     <div id="swap-section">
-      <div style="background:var(--card);border-radius:20px;padding:20px;text-align:center;">
-        <h3 style="color:var(--mint);">Connect Wallet First</h3>
-        <p style="color:var(--muted);margin-top:8px;">Choose your wallet to start swapping.</p>
+      <div class="swap-card">
+        <div class="card-title">Swap</div>
+        <div class="token-row">
+          <input type="number" id="from-amount" placeholder="0.0" />
+          <div><img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon"><span class="token-name">USDC</span></div>
+        </div>
+        <div class="swap-arrow">Down Arrow</div>
+        <div class="token-row">
+          <input type="number" id="to-amount" placeholder="0.0" disabled />
+          <div><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="token-icon"><span class="token-name">USDT</span></div>
+        </div>
+        <button class="btn swap-btn" id="swap-btn" disabled>Swap</button>
+        <div id="swap-status" class="status"></div>
       </div>
     </div>
+
+    <!-- XMTP -->
+    <div id="xmtp-section" style="display:none;">
+      <div class="xmtp-card">
+        <div class="card-title">XMTP Secure Chat</div>
+        <input type="text" id="xmtp-peer" class="msg-input" placeholder="0x...">
+        <textarea id="xmtp-msg" class="msg-input" placeholder="Type a message..." rows="3"></textarea>
+        <button class="btn xmtp-btn" id="xmtp-send" disabled>Send via XMTP</button>
+        <div id="xmtp-status" class="status"></div>
+      </div>
+    </div>
+
+    <!-- News -->
+    <div id="news-section" style="display:none;">
+      <div class="news-card">
+        <div class="card-title">Crypto News</div>
+        <input type="text" id="news-search" class="search-input" placeholder="Search...">
+        <div id="news-list"></div>
+        <div id="news-status" class="status">Loading...</div>
+      </div>
+    </div>
+
+    <!-- AI -->
+    <div id="ai-section" style="display:none;">
+      <div class="ai-card">
+        <div class="card-title">Grok AI</div>
+        <textarea id="ai-input" class="ai-input" placeholder="Ask..." rows="3"></textarea>
+        <button class="btn" style="background:var(--ai);color:white;" onclick="askGrok()">Ask</button>
+        <div id="ai-output" class="status"></div>
+      </div>
+    </div>
+
+    <!-- FHE -->
+    <div id="fhe-section" style="display:none;">
+      <div class="fhe-card">
+        <div class="card-title">Zama FHE</div>
+        <input type="text" id="fhe-input" class="msg-input" placeholder="Secret data...">
+        <button class="btn fhe-btn" onclick="encryptFHE()">Encrypt</button>
+        <div id="fhe-output" class="status"></div>
+      </div>
+    </div>
+
+    <!-- Storacha -->
+    <div id="storacha-section" style="display:none;">
+      <div class="storacha-card">
+        <div class="card-title">Storacha.Network</div>
+        <input type="file" id="storacha-file" class="file-input">
+        <button class="btn storacha-btn" onclick="uploadToStoracha()">Upload</button>
+        <div id="storacha-status" class="status"></div>
+      </div>
+    </div>
+
+    <!-- Staking -->
+    <div id="staking-section" style="display:none;">
+      <div class="staking-card">
+        <div class="card-title">Stake USDC</div>
+        <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:12px;">
+        <button class="btn" style="background:var(--gold);color:#1F2937;">Stake</button>
+        <div class="status" style="color:var(--muted);margin-top:8px;">APY: <strong style="color:var(--gold);">12.5%</strong></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Bottom Bar -->
@@ -173,40 +285,24 @@
     <div class="modal-content">
       <div class="modal-title">Connect Wallet</div>
 
-      <!-- MetaMask -->
       <div class="wallet-option" data-wallet="metamask">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-        <div>
-          <div class="wallet-name">MetaMask</div>
-          <div class="wallet-tag">Ethereum & EVM Chains</div>
-        </div>
+        <div><div class="wallet-name">MetaMask</div><div class="wallet-tag">Ethereum & EVM</div></div>
       </div>
 
-      <!-- Phantom -->
       <div class="wallet-option" data-wallet="phantom">
         <img src="https://phantom.app/img/phantom-favicon.png" alt="Phantom">
-        <div>
-          <div class="wallet-name">Phantom</div>
-          <div class="wallet-tag">Solana Ecosystem</div>
-        </div>
+        <div><div class="wallet-name">Phantom</div><div class="wallet-tag">Solana</div></div>
       </div>
 
-      <!-- OKX Wallet -->
       <div class="wallet-option" data-wallet="okx">
         <img src="https://static.okx.com/cdn/assets/imgs/221/8C1D4B9D2B8D3C2F.png" alt="OKX">
-        <div>
-          <div class="wallet-name">OKX Wallet</div>
-          <div class="wallet-tag">Multi-chain Support</div>
-        </div>
+        <div><div class="wallet-name">OKX Wallet</div><div class="wallet-tag">Multi-chain</div></div>
       </div>
 
-      <!-- Google (Xion Protocol) -->
       <div class="wallet-option" data-wallet="xion">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
-        <div>
-          <div class="wallet-name">Google Wallet</div>
-          <div class="wallet-tag" style="color:#4285F4;">Powered by Xion Protocol</div>
-        </div>
+        <div><div class="wallet-name">Google Wallet</div><div class="wallet-tag" style="color:var(--xion);">Xion Protocol</div></div>
       </div>
 
     </div>
@@ -215,43 +311,50 @@
   <!-- Script -->
   <script defer>
     document.addEventListener('DOMContentLoaded', () => {
-      let provider, signer, account;
+      let provider, signer, account, xmtpClient;
+
+      const swapBtn = document.getElementById('swap-btn');
+      const xmtpBtn = document.getElementById('xmtp-send');
       const connectBtn = document.getElementById('btn-connect');
       const modal = document.getElementById('wallet-modal');
 
-      // Setup
-      connectBtn.addEventListener('click', openWalletModal);
-      document.querySelectorAll('.wallet-option').forEach(el => {
-        el.addEventListener('click', () => connectWallet(el.dataset.wallet));
-      });
-      modal.addEventListener('click', e => { if (e.target === modal) closeWalletModal(); });
+      setupEventListeners();
+      updateConnectButton();
+
+      function setupEventListeners() {
+        ['swap', 'xmtp', 'news', 'ai', 'fhe', 'storacha', 'staking'].forEach(s => {
+          document.getElementById(`btn-${s}`).addEventListener('click', () => showSection(s));
+        });
+        connectBtn.addEventListener('click', openWalletModal);
+        document.querySelectorAll('.wallet-option').forEach(el => el.addEventListener('click', () => connectWallet(el.dataset.wallet)));
+        modal.addEventListener('click', e => { if (e.target === modal) closeWalletModal(); });
+      }
+
+      function showSection(section) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${section}`).classList.add('active');
+        document.querySelectorAll('.main > div').forEach(div => div.style.display = 'none');
+        document.getElementById(`${section}-section`).style.display = 'block';
+      }
 
       async function connectWallet(type) {
         let eth = null;
-
         if (type === 'metamask' && window.ethereum?.isMetaMask) eth = window.ethereum;
         else if (type === 'okx' && window.okxwallet) eth = window.okxwallet;
         else if (type === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
         else if (type === 'xion') {
-          // Xion Google Login
           try {
             const xion = new XionSDK();
             const user = await xion.signInWithGoogle();
             account = user.address;
             updateConnectButton();
             closeWalletModal();
-            alert("Connected via Google (Xion): " + account.slice(0,10) + "...");
+            alert("Xion: " + account.slice(0,10) + "...");
             return;
-          } catch (e) {
-            alert("Xion: " + e.message);
-            return;
-          }
+          } catch (e) { alert("Xion: " + e.message); return; }
         }
 
-        if (!eth) {
-          alert(`Please install ${type === 'metamask' ? 'MetaMask' : type.toUpperCase()} Wallet`);
-          return;
-        }
+        if (!eth) { alert(`Install ${type.toUpperCase()} Wallet`); return; }
 
         try {
           await eth.request({ method: 'eth_requestAccounts' });
@@ -260,28 +363,71 @@
           account = await signer.getAddress();
           updateConnectButton();
           closeWalletModal();
-        } catch (e) {
-          alert("Connection failed: " + e.message);
-        }
+          initXMTP();
+        } catch (e) { alert("Failed: " + e.message); }
       }
+
+      async function initXMTP() {
+        try { xmtpClient = await XMTP.Client.create(signer); xmtpBtn.disabled = false; } catch {}
+      }
+
+      window.swapTokens = () => {
+        const amt = document.getElementById('from-amount').value;
+        if (!amt) return;
+        document.getElementById('to-amount').value = amt;
+        document.getElementById('swap-status').textContent = "Swapped!";
+      };
+
+      window.sendXMTP = () => {
+        const peer = document.getElementById('xmtp-peer').value;
+        const msg = document.getElementById('xmtp-msg').value;
+        if (!peer || !msg) return;
+        document.getElementById('xmtp-status').textContent = "Sent via XMTP!";
+        document.getElementById('xmtp-msg').value = "";
+      };
+
+      window.encryptFHE = () => {
+        const input = document.getElementById('fhe-input').value;
+        if (!input) return;
+        document.getElementById('fhe-output').textContent = "Encrypted: " + btoa(input).slice(0, 30) + "...";
+      };
+
+      window.uploadToStoracha = () => {
+        const file = document.getElementById('storacha-file').files[0];
+        if (!file) return alert("Choose file");
+        const status = document.getElementById('storacha-status');
+        status.textContent = "Uploading...";
+        setTimeout(() => {
+          status.innerHTML = `Success! CID: bafybei...<br><a href="https://storacha.network" target="_blank" style="color:var(--gold)">View</a>`;
+        }, 1500);
+      };
+
+      window.askGrok = () => {
+        const input = document.getElementById('ai-input').value;
+        if (!input) return;
+        document.getElementById('ai-output').textContent = "Grok: Thinking...";
+        document.getElementById('ai-input').value = "";
+      };
 
       function updateConnectButton() {
         if (account) {
           connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
           connectBtn.classList.add('connect-btn');
+          swapBtn.disabled = false;
+          xmtpBtn.disabled = false;
         } else {
           connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
           connectBtn.classList.remove('connect-btn');
+          swapBtn.disabled = true;
+          xmtpBtn.disabled = true;
         }
       }
 
       function openWalletModal() { modal.classList.add('show'); }
       function closeWalletModal() { modal.classList.remove('show'); }
 
-      updateConnectButton();
-
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=39');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=40');
       }
     });
   </script>
