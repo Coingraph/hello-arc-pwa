@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=19" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=20" />
   <meta name="theme-color" content="#7C3AED" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -42,89 +42,83 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar */
+    /* Top Bar - Fixed */
     .topbar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      height: 70px;
-      background: rgba(30, 20, 80, 0.9);
-      backdrop-filter: blur(12px);
+      height: 90px;
+      background: rgba(30, 20, 80, 0.92);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
+      justify-content: center;
+      padding: 12px 16px;
       z-index: 1000;
+      gap: 8px;
     }
 
-    .topbar-left, .topbar-right {
-      display: flex; align-items: center; gap: 12px;
+    /* App Name - Prominent */
+    .app-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 
+        0 0 12px rgba(255, 255, 255, 0.6),
+        0 2px 6px rgba(0, 0, 0, 0.5);
+      letter-spacing: 2px;
+      line-height: 1;
     }
-    .topbar-btn {
-      width: 48px; height: 48px;
+
+    /* Buttons Row - All in One Line */
+    .buttons-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      min-width: 60px;
+      height: 48px;
       border-radius: 16px;
       display: flex;
-      align-items: center; justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 12px;
+      font-weight: 600;
       color: white;
-      background: rgba(139, 92, 246, 0.3);
+      background: rgba(139, 92, 246, 0.25);
       transition: all 0.2s;
+      gap: 4px;
     }
-    .topbar-btn.active {
+    .nav-btn i { font-size: 18px; }
+    .nav-btn.active {
       background: var(--gold);
       color: #1E1B4B;
       font-weight: 700;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
     }
-    .topbar-btn:hover { background: rgba(255, 215, 0, 0.3); }
+    .nav-btn:hover { background: rgba(255, 215, 0, 0.25); }
 
-    /* Center Logo - Big Circle + GLOWING NAME */
-    .logo-center {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 110px; height: 110px;
-      background: radial-gradient(circle at 30% 30%, #60A5FA, #3B82F6);
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center; justify-content: center;
-      box-shadow: 
-        0 8px 25px rgba(59, 130, 246, 0.4),
-        0 0 30px rgba(59, 130, 246, 0.3),
-        inset 0 2px 8px rgba(255,255,255,0.2);
-      z-index: 10;
-      padding: 8px;
-      text-align: center;
-    }
-
-    .logo-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--gold);
-      text-shadow: 
-        0 0 8px rgba(255, 215, 0, 0.8),
-        0 0 16px rgba(255, 215, 0, 0.6),
-        0 2px 4px rgba(0,0,0,0.5);
-      letter-spacing: 1.5px;
-      line-height: 1;
-      margin-top: 4px;
-    }
-
-    .logo-o {
-      font-size: 52px;
-      font-weight: 900;
-      color: white;
-      text-shadow: 
-        0 2px 4px rgba(0,0,0,0.4),
-        0 0 12px rgba(255,255,255,0.3);
+    /* Connect Button - Same Style */
+    .connect-btn {
+      background: linear-gradient(135deg, #FFD700, #FBBF24);
+      color: #1E1B4B;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(255, 215, 0, 0.4);
     }
 
     /* Main */
     .main {
-      padding: 100px 16px 120px;
+      padding: 110px 16px 120px;
       min-height: 100vh;
     }
 
@@ -168,7 +162,7 @@
       transition: 0.2s;
     }
     .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
-    .swap-btn:disabled { background: #5B21B6; }
+    .swap-btn:disabled { background: #5B21B6; opacity: 0.6; }
     .send-btn { background: var(--blue); color: white; }
 
     /* Messages */
@@ -189,20 +183,6 @@
     }
 
     .status { margin-top: 12px; font-size: 14px; color: #A78BFA; text-align: center; }
-
-    /* Connect Button - Gold */
-    #connect-btn {
-      background: linear-gradient(135deg, #FFD700, #FBBF24);
-      color: #1E1B4B;
-      font-weight: 700; padding: 16px;
-      border-radius: 16px; text-align: center;
-      font-size: 16px; margin: 20px 0;
-      cursor: pointer;
-      box-shadow: 
-        0 6px 16px rgba(255, 215, 0, 0.4),
-        0 0 20px rgba(255, 215, 0, 0.3);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
 
     /* Modal */
     .modal {
@@ -245,7 +225,7 @@
     .extra-content p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
     @media (min-width: 480px) {
-      .topbar { padding: 0 20px; }
+      .topbar { padding: 12px 20px; }
       .modal-content { border-radius: 24px; max-width: 380px; }
       .modal { align-items: center; }
     }
@@ -253,26 +233,25 @@
 </head>
 <body>
 
-  <!-- Top Bar -->
+  <!-- Top Bar: Name + Buttons in One Line -->
   <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-btn active" id="btn-swap" onclick="showSection('swap')">
+    <div class="app-name">ZAPCHOK</div>
+    <div class="buttons-row">
+      <div class="nav-btn active" id="btn-swap" onclick="showSection('swap')">
         <i class="fas fa-arrow-right-arrow-left"></i>
+        <span>Swap</span>
       </div>
-      <div class="topbar-btn" id="btn-messages" onclick="showSection('messages')">
+      <div class="nav-btn" id="btn-messages" onclick="showSection('messages')">
         <i class="fas fa-envelope"></i>
+        <span>Messages</span>
       </div>
-    </div>
-
-    <!-- Big Circle + GLOWING NAME -->
-    <div class="logo-center">
-      <div class="logo-o">O</div>
-      <div class="logo-name">ZAPCHOK</div>
-    </div>
-
-    <div class="topbar-right">
-      <div class="topbar-btn" id="btn-staking" onclick="showSection('staking')">
+      <div class="nav-btn" id="btn-connect" onclick="openWalletModal()">
+        <i class="fas fa-wallet"></i>
+        <span>Connect</span>
+      </div>
+      <div class="nav-btn" id="btn-staking" onclick="showSection('staking')">
         <i class="fas fa-coins"></i>
+        <span>Staking</span>
       </div>
     </div>
   </div>
@@ -299,11 +278,9 @@
             <span class="token-name">USDT</span>
           </div>
         </div>
-        <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Connect to Swap</button>
+        <button class="btn swap-btn" id="swap-btn" onclick="swapTokens()" disabled>Swap</button>
         <div id="swap-status" class="status"></div>
       </div>
-
-      <div id="connect-btn" onclick="openWalletModal()">Connect Wallet</div>
     </div>
 
     <!-- Messages -->
@@ -323,7 +300,7 @@
       <div class="card">
         <div class="card-title">Stake USDC</div>
         <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:14px;">
-        <button class="btn" style="background:var(--gold);color:#1E1B4B;box-shadow:0 4px 12px rgba(255,215,0,0.4);">Stake</button>
+        <button class="btn" style="background:var(--gold);color:#1E1B4B;">Stake</button>
         <div class="status" style="color:var(--muted);margin-top:10px;">APY: <strong style="color:var(--gold);">12.5%</strong></div>
       </div>
     </div>
@@ -359,11 +336,18 @@
     let provider, account, xmtpClient, fheInstance, w3;
 
     function showSection(section) {
-      document.querySelectorAll('.topbar-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`btn-${section}`).classList.add('active');
       ['swap', 'messages', 'staking'].forEach(s => {
         document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
       });
+      // Update Connect button
+      const connectBtn = document.getElementById('btn-connect');
+      if (account) {
+        connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
+        connectBtn.onclick = null;
+        connectBtn.classList.add('connect-btn');
+      }
     }
 
     async function connectWallet(name) {
@@ -376,8 +360,13 @@
         await eth.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(eth);
         account = await provider.getSigner().getAddress();
-        document.getElementById('connect-btn').innerHTML = `<strong>${account.slice(0,6)}...${account.slice(-4)}</strong>`;
-        document.getElementById('connect-btn').onclick = null;
+        
+        // Update Connect button in nav
+        const connectBtn = document.getElementById('btn-connect');
+        connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
+        connectBtn.onclick = null;
+        connectBtn.classList.add('connect-btn');
+        
         document.getElementById('swap-btn').disabled = false;
         document.getElementById('swap-btn').textContent = "Swap";
         closeWalletModal();
@@ -439,7 +428,7 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=19');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=20');
     }
   </script>
 </body>
