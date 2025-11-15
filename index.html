@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=40" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=42" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -20,11 +20,8 @@
   <script src="/hello-arc-pwa/ethers.js"></script>
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
   <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
-  <script type="module">
-    import { create } from 'https://esm.run/@storacha/client';
-    window.createStorachaClient = create;
-  </script>
-  <script src="https://unpkg.com/@xion-protocol/sdk@latest/dist/index.js"></script>
+  <!-- Xion SDK (Official from Burnt Labs) -->
+  <script src="https://unpkg.com/@burnt-labs/abstraxion@0.1.0/dist/index.umd.js"></script>
 
   <style>
     :root {
@@ -58,7 +55,7 @@
 
     .buttons-row {
       display: flex; align-items: center; justify-content: flex-end;
-      gap: 8px; width: 100%; max-width: 600px; padding-right: 8px; flex-wrap: wrap;
+      gap: 8px; width: 100%; max-width: 700px; padding-right: 8px; flex-wrap: wrap;
     }
 
     .nav-btn {
@@ -79,7 +76,7 @@
 
     .main { padding: 100px 12px 20px; min-height: calc(100vh - 160px); }
 
-    .swap-card, .msg-card, .news-card, .ai-card, .xmtp-card, .fhe-card, .storacha-card, .staking-card {
+    .swap-card, .xmtp-card, .news-card, .ai-card, .fhe-card, .storacha-card, .staking-card {
       background: var(--card); border-radius: 20px; padding: 16px;
       border: 1px solid var(--border); margin-bottom: 16px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
@@ -155,8 +152,7 @@
     .social-btn.tiktok { background: #000000; }
     .social-btn.aurara { background: #FF6B6B; }
     .social-btn i { font-size: 16px; color: white; }
-    .
-social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
 
     @media (max-width: 480px) {
       .topbar { height: 85px; }
@@ -310,7 +306,7 @@ social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4
 
   <!-- Script -->
   <script defer>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       let provider, signer, account, xmtpClient;
 
       const swapBtn = document.getElementById('swap-btn');
@@ -344,14 +340,18 @@ social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4
         else if (type === 'phantom' && window.phantom?.ethereum) eth = window.phantom.ethereum;
         else if (type === 'xion') {
           try {
-            const xion = new XionSDK();
-            const user = await xion.signInWithGoogle();
-            account = user.address;
+            const { Abstraxion } = window.abstraxion;
+            const abstraxion = new Abstraxion();
+            const result = await abstraxion.connect();
+            account = result.address;
             updateConnectButton();
             closeWalletModal();
-            alert("Xion: " + account.slice(0,10) + "...");
+            alert("Xion Connected: " + account.slice(0,10) + "...");
             return;
-          } catch (e) { alert("Xion: " + e.message); return; }
+          } catch (e) {
+            alert("Xion Error: " + e.message);
+            return;
+          }
         }
 
         if (!eth) { alert(`Install ${type.toUpperCase()} Wallet`); return; }
@@ -427,7 +427,7 @@ social-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.4
       function closeWalletModal() { modal.classList.remove('show'); }
 
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=40');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=42');
       }
     });
   </script>
