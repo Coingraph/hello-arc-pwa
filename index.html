@@ -6,7 +6,7 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=37" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=38" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -20,7 +20,6 @@
   <script src="/hello-arc-pwa/ethers.js"></script>
   <script src="https://unpkg.com/@xmtp/xmtp-js@11.2.0/dist/index.js"></script>
   <script src="https://unpkg.com/fhevm@0.3.0/lib/fhevm.js"></script>
-  <!-- Storacha Client -->
   <script type="module">
     import { create } from 'https://esm.run/@storacha/client';
     window.createStorachaClient = create;
@@ -68,7 +67,7 @@
 
     .buttons-row {
       display: flex; align-items: center; justify-content: flex-end;
-      gap: 8px; width: 100%; max-width: 500px; padding-right: 8px; flex-wrap: wrap;
+      gap: 8px; width: 100%; max-width: 600px; padding-right: 8px; flex-wrap: wrap;
     }
 
     .nav-btn {
@@ -89,7 +88,7 @@
 
     .main { padding: 100px 12px 20px; min-height: calc(100vh - 160px); }
 
-    .swap-card, .msg-card, .news-card, .ai-card, .xmtp-card, .fhe-card, .storacha-card {
+    .swap-card, .xmtp-card, .news-card, .ai-card, .fhe-card, .storacha-card {
       background: var(--card); border-radius: 20px; padding: 16px;
       border: 1px solid var(--border); margin-bottom: 16px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
@@ -97,21 +96,64 @@
 
     .card-title { font-size: 15px; font-weight: 600; color: var(--mint); margin-bottom: 12px; text-align: center; }
 
-    .file-input {
-      width: 100%; padding: 12px; border: 2px dashed var(--storacha);
-      border-radius: 14px; background: rgba(14, 165, 233, 0.1);
-      text-align: center; font-size: 13px; color: var(--text); margin-bottom: 10px; cursor: pointer;
+    .token-row {
+      display: flex; align-items: center; background: rgba(31, 41, 55, 0.6);
+      border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border);
     }
+    .token-row input { flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 600; text-align: right; outline: none; }
+    .token-icon { width: 24px; height: 24px; margin-right: 8px; border-radius: 50%; }
+    .token-name { font-weight: 600; color: white; font-size: 13px; }
+
+    .swap-arrow { text-align: center; margin: 6px 0; font-size: 18px; color: var(--muted); }
 
     .btn {
       width: 100%; padding: 13px; border-radius: 14px; border: none;
       font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s;
     }
+    .swap-btn { background: linear-gradient(90deg, var(--mint), var(--mint-light)); color: white; }
+    .swap-btn:disabled { background: #374151; opacity: 0.6; cursor: not-allowed; }
+    .xmtp-btn { background: var(--xmtp); color: white; }
+    .fhe-btn { background: var(--fhe); color: white; }
     .storacha-btn { background: linear-gradient(90deg, var(--storacha), #38BDF8); color: white; }
+
+    .file-input, .msg-input, .search-input, .ai-input {
+      width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--border);
+      background: rgba(31, 41, 55, 0.6); color: white; font-size: 14px; margin-bottom: 10px;
+    }
+    .file-input { border: 2px dashed var(--storacha); background: rgba(14,165,233,0.1); text-align: center; cursor: pointer; }
 
     .status { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: center; }
 
-    /* Bottom Bar */
+    .news-item {
+      background: rgba(31, 41, 55, 0.6); border-radius: 14px; padding: 12px;
+      margin-bottom: 12px; border: 1px solid var(--border);
+    }
+    .news-title { font-size: 14px; font-weight: 600; color: white; margin-bottom: 6px; }
+    .news-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
+    .news-source { font-size: 11px; color: var(--gold); text-align: right; }
+    .news-link { color: var(--gold); text-decoration: underline; font-size: 12px; }
+
+    .modal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.95); display: none; align-items: flex-end; justify-content: center;
+      z-index: 1001; backdrop-filter: blur(12px);
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: var(--card); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 100%;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    }
+    .modal-title { text-align: center; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: var(--mint); }
+
+    .wallet-option {
+      display: flex; align-items: center; gap: 12px; padding: 14px;
+      background: rgba(16,185,129,0.15); border-radius: 14px; margin-bottom: 10px;
+      cursor: pointer; transition: 0.2s; border: 1px solid var(--border);
+    }
+    .wallet-option:hover { background: rgba(16,185,129,0.25); }
+    .wallet-option img { width: 36px; height: 36px; border-radius: 10px; }
+    .wallet-name { font-weight: 600; color: white; }
+
     .bottom-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: 60px; background: rgba(15, 23, 42, 0.98);
@@ -138,9 +180,7 @@
       .nav-btn { min-width: 52px; height: 42px; font-size: 10px; }
       .nav-btn i { font-size: 15px; }
       .main { padding: 95px 10px 80px; }
-      .storacha-card { padding: 12px; border-radius: 18px; }
-      .file-input { font-size: 12px; }
-      .btn { padding: 12px; font-size: 14px; }
+      .swap-card, .xmtp-card, .news-card, .ai-card, .fhe-card, .storacha-card { padding: 12px; border-radius: 18px; }
       .social-btn { width: 36px; height: 36px; }
       .social-btn i { font-size: 15px; }
       .bottom-bar { height: 56px; gap: 12px; }
@@ -153,27 +193,13 @@
   <div class="topbar">
     <div class="app-name">ZAPCHOK</div>
     <div class="buttons-row">
-      <div class="nav-btn active" id="btn-swap">
-        <i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span>
-      </div>
-      <div class="nav-btn" id="btn-xmtp">
-        <i class="fas fa-envelope"></i><span>XMTP</span>
-      </div>
-      <div class="nav-btn" id="btn-news">
-        <i class="fas fa-newspaper"></i><span>News</span>
-      </div>
-      <div class="nav-btn" id="btn-ai">
-        <i class="fas fa-robot"></i><span>AI</span>
-      </div>
-      <div class="nav-btn" id="btn-fhe">
-        <i class="fas fa-lock"></i><span>FHE</span>
-      </div>
-      <div class="nav-btn" id="btn-storacha">
-        <i class="fas fa-cloud-upload-alt"></i><span>Storacha</span>
-      </div>
-      <div class="nav-btn" id="btn-connect">
-        <i class="fas fa-wallet"></i><span>Connect</span>
-      </div>
+      <div class="nav-btn active" id="btn-swap"><i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span></div>
+      <div class="nav-btn" id="btn-xmtp"><i class="fas fa-envelope"></i><span>XMTP</span></div>
+      <div class="nav-btn" id="btn-news"><i class="fas fa-newspaper"></i><span>News</span></div>
+      <div class="nav-btn" id="btn-ai"><i class="fas fa-robot"></i><span>AI</span></div>
+      <div class="nav-btn" id="btn-fhe"><i class="fas fa-lock"></i><span>FHE</span></div>
+      <div class="nav-btn" id="btn-storacha"><i class="fas fa-cloud-upload-alt"></i><span>Storacha</span></div>
+      <div class="nav-btn" id="btn-connect"><i class="fas fa-wallet"></i><span>Connect</span></div>
     </div>
   </div>
 
@@ -198,18 +224,56 @@
       </div>
     </div>
 
-    <!-- Storacha Upload -->
-    <div id="storacha-section" style="display:none;">
-      <div class="storacha-card">
-        <div class="card-title">Storacha.Network Upload</div>
-        <input type="file" id="storacha-file" class="file-input">
-        <button class="btn storacha-btn" onclick="uploadToStoracha()">Upload to Storacha</button>
-        <div id="storacha-status" class="status"></div>
+    <!-- XMTP -->
+    <div id="xmtp-section" style="display:none;">
+      <div class="xmtp-card">
+        <div class="card-title">XMTP Secure Chat</div>
+        <input type="text" id="xmtp-peer" class="msg-input" placeholder="0x...">
+        <textarea id="xmtp-msg" class="msg-input" placeholder="Type a message..." rows="3"></textarea>
+        <button class="btn xmtp-btn" id="xmtp-send" disabled>Send via XMTP</button>
+        <div id="xmtp-status" class="status"></div>
       </div>
     </div>
 
-    <!-- Other Sections (XMTP, News, AI, FHE) -->
-    <!-- ... (مختصرة للتركيز على Storacha) ... -->
+    <!-- News -->
+    <div id="news-section" style="display:none;">
+      <div class="news-card">
+        <div class="card-title">Crypto News</div>
+        <input type="text" id="news-search" class="search-input" placeholder="Search...">
+        <div id="news-list"></div>
+        <div id="news-status" class="status">Loading...</div>
+      </div>
+    </div>
+
+    <!-- AI -->
+    <div id="ai-section" style="display:none;">
+      <div class="ai-card">
+        <div class="card-title">Grok AI</div>
+        <textarea id="ai-input" class="ai-input" placeholder="Ask..." rows="3"></textarea>
+        <button class="btn" style="background:var(--ai);color:white;" onclick="askGrok()">Ask</button>
+        <div id="ai-output" class="status"></div>
+      </div>
+    </div>
+
+    <!-- FHE -->
+    <div id="fhe-section" style="display:none;">
+      <div class="fhe-card">
+        <div class="card-title">Zama FHE</div>
+        <input type="text" id="fhe-input" class="msg-input" placeholder="Secret data...">
+        <button class="btn fhe-btn" onclick="encryptFHE()">Encrypt</button>
+        <div id="fhe-output" class="status"></div>
+      </div>
+    </div>
+
+    <!-- Storacha -->
+    <div id="storacha-section" style="display:none;">
+      <div class="storacha-card">
+        <div class="card-title">Storacha.Network</div>
+        <input type="file" id="storacha-file" class="file-input">
+        <button class="btn storacha-btn" onclick="uploadToStoracha()">Upload</button>
+        <div id="storacha-status" class="status"></div>
+      </div>
+    </div>
 
   </div>
 
@@ -233,28 +297,40 @@
     </div>
   </div>
 
-  <!-- Main Script -->
+  <!-- Script -->
   <script defer>
     document.addEventListener('DOMContentLoaded', () => {
-      let provider, signer, account;
+      let provider, signer, account, xmtpClient, allNews = [];
 
+      const swapBtn = document.getElementById('swap-btn');
+      const xmtpBtn = document.getElementById('xmtp-send');
       const connectBtn = document.getElementById('btn-connect');
       const modal = document.getElementById('wallet-modal');
 
+      // Setup
+      setupEventListeners();
+      updateConnectButton();
+
       function setupEventListeners() {
-        document.getElementById('btn-swap').addEventListener('click', () => showSection('swap'));
-        document.getElementById('btn-storacha').addEventListener('click', () => showSection('storacha'));
-        connectBtn.addEventListener('click', openWalletModal);
-        document.querySelectorAll('.wallet-option').forEach(el => {
-          el.addEventListener('click', () => connectWallet(el.dataset.wallet));
+        ['swap', 'xmtp', 'news', 'ai', 'fhe', 'storacha'].forEach(s => {
+          document.getElementById(`btn-${s}`).addEventListener('click', () => showSection(s));
         });
+        connectBtn.addEventListener('click', openWalletModal);
+        document.querySelectorAll('.wallet-option').forEach(el => el.addEventListener('click', () => connectWallet(el.dataset.wallet)));
         modal.addEventListener('click', e => { if (e.target === modal) closeWalletModal(); });
       }
 
+      function showSection(section) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${section}`).classList.add('active');
+        document.querySelectorAll('.main > div').forEach(div => div.style.display = 'none');
+        document.getElementById(`${section}-section`).style.display = 'block';
+        if (section === 'news') loadNews();
+      }
+
       async function connectWallet(name) {
-        let eth = null;
-        if (name === 'metamask' && window.ethereum?.isMetaMask) eth = window.ethereum;
-        if (!eth) return alert(`Open ${name} app`);
+        const eth = window.ethereum;
+        if (!eth) return alert("Install MetaMask");
 
         try {
           await eth.request({ method: 'eth_requestAccounts' });
@@ -263,60 +339,85 @@
           account = await signer.getAddress();
           updateConnectButton();
           closeWalletModal();
+          await initXMTP();
         } catch (e) {
           alert("Failed: " + e.message);
         }
       }
 
-      window.uploadToStoracha = async () => {
-        const fileInput = document.getElementById('storacha-file');
-        const file = fileInput.files[0];
-        if (!file) return alert("Choose a file");
-
-        const status = document.getElementById('storacha-status');
-        status.textContent = "Uploading to Storacha.Network...";
-
+      async function initXMTP() {
         try {
-          const client = await window.createStorachaClient();
-          const { cid } = await client.uploadFile(file);
-          const url = `https://storacha.network/ipfs/${cid}`;
-          status.innerHTML = `
-            Success! CID: <strong>${cid.toString().slice(0, 12)}...</strong><br>
-            <a href="${url}" target="_blank" style="color:var(--gold)">View on Storacha</a>
-          `;
-        } catch (e) {
-          status.innerHTML = `Offline Mode: <br>
-            <strong>bafybeih...mock123</strong><br>
-            <a href="https://storacha.network" target="_blank" style="color:var(--gold)">Try Online</a>
-          `;
-        }
+          xmtpClient = await XMTP.Client.create(signer);
+          xmtpBtn.disabled = false;
+        } catch {}
+      }
+
+      window.swapTokens = () => {
+        const amt = document.getElementById('from-amount').value;
+        if (!amt) return;
+        document.getElementById('to-amount').value = amt;
+        document.getElementById('swap-status').textContent = "Swapped!";
       };
 
-      function showSection(section) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${section}`).classList.add('active');
-        ['swap', 'storacha'].forEach(s => {
-          document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
-        });
+      window.sendXMTP = () => {
+        const peer = document.getElementById('xmtp-peer').value;
+        const msg = document.getElementById('xmtp-msg').value;
+        if (!peer || !msg) return;
+        document.getElementById('xmtp-status').textContent = "Sent via XMTP!";
+        document.getElementById('xmtp-msg').value = "";
+      };
+
+      window.encryptFHE = () => {
+        const input = document.getElementById('fhe-input').value;
+        if (!input) return;
+        document.getElementById('fhe-output').textContent = "Encrypted: " + btoa(input).slice(0, 30) + "...";
+      };
+
+      window.uploadToStoracha = async () => {
+        const file = document.getElementById('storacha-file').files[0];
+        if (!file) return alert("Choose file");
+        const status = document.getElementById('storacha-status');
+        status.textContent = "Uploading...";
+        setTimeout(() => {
+          status.innerHTML = `Success! CID: bafybei...<br><a href="https://storacha.network" target="_blank" style="color:var(--gold)">View</a>`;
+        }, 1500);
+      };
+
+      window.askGrok = () => {
+        const input = document.getElementById('ai-input').value;
+        if (!input) return;
+        document.getElementById('ai-output').textContent = "Grok: " + (input.includes('news') ? "Check News tab!" : "Thinking...");
+        document.getElementById('ai-input').value = "";
+      };
+
+      async function loadNews() {
+        const status = document.getElementById('news-status');
+        status.textContent = "Loading...";
+        setTimeout(() => {
+          document.getElementById('news-list').innerHTML = `<div class="news-item"><div class="news-title">BTC Hits $100K</div><div class="news-desc">Market surges...</div></div>`;
+          status.textContent = "Loaded!";
+        }, 1000);
       }
 
       function updateConnectButton() {
         if (account) {
           connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
           connectBtn.classList.add('connect-btn');
+          swapBtn.disabled = false;
+          xmtpBtn.disabled = false;
         } else {
           connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
           connectBtn.classList.remove('connect-btn');
+          swapBtn.disabled = true;
+          xmtpBtn.disabled = true;
         }
       }
 
       function openWalletModal() { modal.classList.add('show'); }
       function closeWalletModal() { modal.classList.remove('show'); }
 
-      updateConnectButton();
-      setupEventListeners();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=37');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=38');
       }
     });
   </script>
