@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ZapChok AI</title>
+  <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=32" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=33" />
   <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
@@ -27,6 +27,11 @@
       --text: #ECFDF5;
       --muted: #A7F3D0;
       --ai: #6366F1;
+      --x: #000000;
+      --farcaster: #8B5CF6;
+      --telegram: #229ED9;
+      --tiktok: #000000;
+      --aurara: #FF6B6B;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: auto; min-height: 100vh; overflow-x: hidden; }
@@ -53,7 +58,7 @@
 
     .buttons-row {
       display: flex; align-items: center; justify-content: flex-end;
-      gap: 8px; width: 100%; max-width: 400px; padding-right: 8px;
+      gap: 8px; width: 100%; max-width: 500px; padding-right: 8px; flex-wrap: wrap;
     }
 
     .nav-btn {
@@ -71,10 +76,18 @@
       color: #064E3B; font-weight: 700; box-shadow: 0 4px 12px rgba(252,211,77,0.5);
     }
 
-    .ai-btn {
-      background: linear-gradient(135deg, var(--ai), #4F46E5);
-      color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(99,102,241,0.5);
+    .social-btn {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
     }
+    .social-btn.x { background: var(--x); }
+    .social-btn.farcaster { background: var(--farcaster); }
+    .social-btn.telegram { background: var(--telegram); }
+    .social-btn.tiktok { background: var(--tiktok); }
+    .social-btn.aurara { background: var(--aurara); }
+    .social-btn i { font-size: 18px; color: white; }
+    .social-btn:hover { transform: scale(1.1); }
 
     .main { padding: 100px 12px 120px; min-height: 100vh; }
 
@@ -172,6 +185,8 @@
       .app-name { font-size: 28px; }
       .nav-btn { min-width: 52px; height: 42px; font-size: 10px; }
       .nav-btn i { font-size: 15px; }
+      .social-btn { width: 40px; height: 40px; }
+      .social-btn i { font-size: 16px; }
       .main { padding: 95px 10px 110px; }
       .swap-card, .msg-card, .news-card, .ai-card { padding: 12px; border-radius: 18px; }
       .token-row { padding: 9px 11px; }
@@ -187,7 +202,7 @@
 
   <!-- Top Bar -->
   <div class="topbar">
-    <div class="app-name">ZAPCHOK AI</div>
+    <div class="app-name">ZAPCHOK</div>
     <div class="buttons-row">
       <div class="nav-btn active" id="btn-swap">
         <i class="fas fa-arrow-right-arrow-left"></i><span>Swap</span>
@@ -207,6 +222,13 @@
       <div class="nav-btn" id="btn-staking">
         <i class="fas fa-coins"></i><span>Staking</span>
       </div>
+
+      <!-- Social Icons -->
+      <a href="https://x.com/zapchok" target="_blank" class="social-btn x"><i class="fab fa-x-twitter"></i></a>
+      <a href="https://warpcast.com/zapchok" target="_blank" class="social-btn farcaster"><i class="fas fa-globe"></i></a>
+      <a href="https://t.me/zapchok" target="_blank" class="social-btn telegram"><i class="fab fa-telegram"></i></a>
+      <a href="https://tiktok.com/@zapchok" target="_blank" class="social-btn tiktok"><i class="fab fa-tiktok"></i></a>
+      <a href="https://aurara.app/zapchok" target="_blank" class="social-btn aurara"><i class="fas fa-star"></i></a>
     </div>
   </div>
 
@@ -258,7 +280,7 @@
       <div class="ai-card">
         <div class="card-title">Grok AI Assistant (xAI)</div>
         <textarea id="ai-input" class="ai-input" placeholder="Ask anything... (e.g. What is the latest BTC news?)" rows="3"></textarea>
-        <button class="btn ai-btn" id="ai-send" onclick="askGrok()">Ask Grok</button>
+        <button class="btn" style="background:var(--ai);color:white;" onclick="askGrok()">Ask Grok</button>
         <div id="ai-output" class="ai-output"></div>
         <div id="ai-status" class="status"></div>
       </div>
@@ -276,8 +298,8 @@
 
     <!-- Extra -->
     <div class="extra-content">
-      <h3>Grok AI + News + Wallet</h3>
-      <p>Works in NL & DZ</p>
+      <h3>AI + News + Social</h3>
+      <p>Follow us on X, Farcaster, Telegram, TikTok, Aurara</p>
     </div>
 
   </div>
@@ -485,7 +507,7 @@
           output.innerHTML = data.choices[0].message.content.replace(/\n/g, '<br>');
           status.textContent = 'Grok answered!';
         } catch (e) {
-          output.innerHTML = `Offline: ${input.includes('news') ? 'Check News tab for latest!' : 'Try again later.'}`;
+          output.innerHTML = `Offline: ${input.includes('news') ? 'Check News tab!' : 'Try again later.'}`;
           status.textContent = 'Offline mode';
         }
         document.getElementById('ai-input').value = '';
@@ -496,7 +518,7 @@
 
       updateConnectButton();
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=32');
+        navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=33');
       }
     });
   </script>
