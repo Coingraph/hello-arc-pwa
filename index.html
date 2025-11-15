@@ -6,8 +6,8 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=20" />
-  <meta name="theme-color" content="#7C3AED" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=21" />
+  <meta name="theme-color" content="#10B981" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
@@ -24,20 +24,21 @@
 
   <style>
     :root {
-      --purple: #7C3AED;
-      --blue: #3B82F6;
-      --gold: #FFD700;
-      --dark: #1E1B4B;
-      --card: #2D1B69;
-      --border: #5B21B6;
-      --text: #E9D5FF;
-      --muted: #C4B5FD;
+      --green: #10B981;
+      --green-dark: #059669;
+      --green-light: #34D399;
+      --gold: #FCD34D;
+      --dark: #064E3B;
+      --card: #065F46;
+      --border: #10B981;
+      --text: #ECFDF5;
+      --muted: #A7F3D0;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: auto; min-height: 100vh; overflow-x: hidden; }
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #4C1D95, #1E1B4B);
+      background: linear-gradient(135deg, #065F46, #10B981);
       color: var(--text);
       -webkit-tap-highlight-color: transparent;
     }
@@ -47,7 +48,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       height: 90px;
-      background: rgba(30, 20, 80, 0.92);
+      background: rgba(6, 78, 59, 0.92);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -72,18 +73,19 @@
       line-height: 1;
     }
 
-    /* Buttons Row - All in One Line */
+    /* Buttons Row - Right Aligned */
     .buttons-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
+      justify-content: flex-end;
+      gap: 10px;
       width: 100%;
       max-width: 400px;
+      padding-right: 8px;
     }
 
     .nav-btn {
-      flex: 1;
+      flex: 0 0 auto;
       min-width: 60px;
       height: 48px;
       border-radius: 16px;
@@ -95,25 +97,26 @@
       font-size: 12px;
       font-weight: 600;
       color: white;
-      background: rgba(139, 92, 246, 0.25);
+      background: rgba(16, 185, 129, 0.3);
       transition: all 0.2s;
       gap: 4px;
+      padding: 0 8px;
     }
     .nav-btn i { font-size: 18px; }
     .nav-btn.active {
       background: var(--gold);
-      color: #1E1B4B;
+      color: #064E3B;
       font-weight: 700;
-      box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 16px rgba(252, 211, 77, 0.6);
     }
-    .nav-btn:hover { background: rgba(255, 215, 0, 0.25); }
+    .nav-btn:hover { background: rgba(252, 211, 77, 0.3); }
 
-    /* Connect Button - Same Style */
+    /* Connect Button - Gold */
     .connect-btn {
-      background: linear-gradient(135deg, #FFD700, #FBBF24);
-      color: #1E1B4B;
+      background: linear-gradient(135deg, #FCD34D, #FBBF24);
+      color: #064E3B;
       font-weight: 700;
-      box-shadow: 0 4px 14px rgba(255, 215, 0, 0.4);
+      box-shadow: 0 4px 14px rgba(252, 211, 77, 0.5);
     }
 
     /* Main */
@@ -138,7 +141,7 @@
     /* Token Row */
     .token-row {
       display: flex; align-items: center;
-      background: rgba(88, 28, 135, 0.5);
+      background: rgba(4, 120, 87, 0.6);
       border-radius: 16px;
       padding: 12px 14px;
       margin-bottom: 10px;
@@ -162,15 +165,15 @@
       transition: 0.2s;
     }
     .swap-btn { background: linear-gradient(90deg, #10B981, #34D399); color: white; }
-    .swap-btn:disabled { background: #5B21B6; opacity: 0.6; }
-    .send-btn { background: var(--blue); color: white; }
+    .swap-btn:disabled { background: #065F46; opacity: 0.6; }
+    .send-btn { background: #1D4ED8; color: white; }
 
     /* Messages */
     .file-input {
       width: 100%; padding: 14px;
       border: 2px dashed var(--gold);
       border-radius: 16px;
-      background: rgba(255, 215, 0, 0.1);
+      background: rgba(252, 211, 77, 0.1);
       text-align: center; font-size: 14px;
       color: var(--text); margin-bottom: 12px;
       cursor: pointer;
@@ -178,11 +181,11 @@
     .msg-input {
       width: 100%; padding: 14px;
       border-radius: 16px; border: 1px solid var(--border);
-      background: rgba(88, 28, 135, 0.5); color: white;
+      background: rgba(4, 120, 87, 0.6); color: white;
       font-size: 15px; margin-bottom: 12px;
     }
 
-    .status { margin-top: 12px; font-size: 14px; color: #A78BFA; text-align: center; }
+    .status { margin-top: 12px; font-size: 14px; color: #A7F3D0; text-align: center; }
 
     /* Modal */
     .modal {
@@ -195,20 +198,20 @@
     .modal-content {
       background: var(--card); border-radius: 24px 24px 0 0;
       padding: 24px; width: 100%; max-width: 100%;
-      box-shadow: 0 -12px 40px rgba(0,0,0,0.3);
+      box...
     }
     .modal-title { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 16px; color: white; }
 
     .wallet-option {
       display: flex; align-items: center; gap: 14px;
       padding: 16px;
-      background: rgba(139, 92, 246, 0.2);
+      background: rgba(16, 185, 129, 0.25);
       border-radius: 16px;
       margin-bottom: 12px;
       cursor: pointer;
       transition: 0.2s;
     }
-    .wallet-option:hover { background: rgba(139, 92, 246, 0.4); }
+    .wallet-option:hover { background: rgba(16, 185, 129, 0.4); }
     .wallet-option img { width: 40px; height: 40px; border-radius: 12px; }
     .wallet-name { font-weight: 600; color: white; }
 
@@ -226,6 +229,7 @@
 
     @media (min-width: 480px) {
       .topbar { padding: 12px 20px; }
+      .buttons-row { padding-right: 12px; }
       .modal-content { border-radius: 24px; max-width: 380px; }
       .modal { align-items: center; }
     }
@@ -233,7 +237,7 @@
 </head>
 <body>
 
-  <!-- Top Bar: Name + Buttons in One Line -->
+  <!-- Top Bar: Name + Buttons on Right -->
   <div class="topbar">
     <div class="app-name">ZAPCHOK</div>
     <div class="buttons-row">
@@ -300,7 +304,7 @@
       <div class="card">
         <div class="card-title">Stake USDC</div>
         <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:14px;">
-        <button class="btn" style="background:var(--gold);color:#1E1B4B;">Stake</button>
+        <button class="btn" style="background:var(--gold);color:#064E3B;">Stake</button>
         <div class="status" style="color:var(--muted);margin-top:10px;">APY: <strong style="color:var(--gold);">12.5%</strong></div>
       </div>
     </div>
@@ -341,12 +345,19 @@
       ['swap', 'messages', 'staking'].forEach(s => {
         document.getElementById(`${s}-section`).style.display = s === section ? 'block' : 'none';
       });
-      // Update Connect button
+      updateConnectButton();
+    }
+
+    function updateConnectButton() {
       const connectBtn = document.getElementById('btn-connect');
       if (account) {
         connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
         connectBtn.onclick = null;
         connectBtn.classList.add('connect-btn');
+      } else {
+        connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>Connect</span>`;
+        connectBtn.onclick = openWalletModal;
+        connectBtn.classList.remove('connect-btn');
       }
     }
 
@@ -360,13 +371,7 @@
         await eth.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(eth);
         account = await provider.getSigner().getAddress();
-        
-        // Update Connect button in nav
-        const connectBtn = document.getElementById('btn-connect');
-        connectBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${account.slice(0,4)}...${account.slice(-4)}</span>`;
-        connectBtn.onclick = null;
-        connectBtn.classList.add('connect-btn');
-        
+        updateConnectButton();
         document.getElementById('swap-btn').disabled = false;
         document.getElementById('swap-btn').textContent = "Swap";
         closeWalletModal();
@@ -427,8 +432,11 @@
       if (e.target === document.getElementById('wallet-modal')) closeWalletModal();
     });
 
+    // Initialize
+    updateConnectButton();
+
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=20');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=21');
     }
   </script>
 </body>
