@@ -6,12 +6,12 @@
   <title>ZapChok</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=18" />
+  <link rel="manifest" href="/hello-arc-pwa/manifest.json?v=19" />
   <meta name="theme-color" content="#7C3AED" />
   <link rel="icon" href="/hello-arc-pwa/icons/icon-192.png" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -26,7 +26,7 @@
     :root {
       --purple: #7C3AED;
       --blue: #3B82F6;
-      --yellow: #FBBF24;
+      --gold: #FFD700;
       --dark: #1E1B4B;
       --card: #2D1B69;
       --border: #5B21B6;
@@ -42,7 +42,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Bar - Fixed, Side Buttons */
+    /* Top Bar */
     .topbar {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -72,32 +72,54 @@
       transition: all 0.2s;
     }
     .topbar-btn.active {
-      background: var(--yellow);
+      background: var(--gold);
       color: #1E1B4B;
       font-weight: 700;
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
     }
-    .topbar-btn:hover { background: rgba(251, 191, 36, 0.3); }
+    .topbar-btn:hover { background: rgba(255, 215, 0, 0.3); }
 
-    /* Center Logo - Big Circle */
+    /* Center Logo - Big Circle + GLOWING NAME */
     .logo-center {
       position: absolute;
       left: 50%; top: 50%;
       transform: translate(-50%, -50%);
-      width: 100px; height: 100px;
+      width: 110px; height: 110px;
       background: radial-gradient(circle at 30% 30%, #60A5FA, #3B82F6);
       border-radius: 50%;
       display: flex;
+      flex-direction: column;
       align-items: center; justify-content: center;
-      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+      box-shadow: 
+        0 8px 25px rgba(59, 130, 246, 0.4),
+        0 0 30px rgba(59, 130, 246, 0.3),
+        inset 0 2px 8px rgba(255,255,255,0.2);
       z-index: 10;
+      padding: 8px;
+      text-align: center;
     }
-    .logo-center::before {
-      content: "O";
-      font-size: 48px;
+
+    .logo-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
       font-weight: 800;
+      color: var(--gold);
+      text-shadow: 
+        0 0 8px rgba(255, 215, 0, 0.8),
+        0 0 16px rgba(255, 215, 0, 0.6),
+        0 2px 4px rgba(0,0,0,0.5);
+      letter-spacing: 1.5px;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .logo-o {
+      font-size: 52px;
+      font-weight: 900;
       color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      text-shadow: 
+        0 2px 4px rgba(0,0,0,0.4),
+        0 0 12px rgba(255,255,255,0.3);
     }
 
     /* Main */
@@ -152,9 +174,9 @@
     /* Messages */
     .file-input {
       width: 100%; padding: 14px;
-      border: 2px dashed var(--yellow);
+      border: 2px dashed var(--gold);
       border-radius: 16px;
-      background: rgba(251, 191, 36, 0.1);
+      background: rgba(255, 215, 0, 0.1);
       text-align: center; font-size: 14px;
       color: var(--text); margin-bottom: 12px;
       cursor: pointer;
@@ -168,14 +190,18 @@
 
     .status { margin-top: 12px; font-size: 14px; color: #A78BFA; text-align: center; }
 
-    /* Connect Button - Yellow */
+    /* Connect Button - Gold */
     #connect-btn {
-      background: var(--yellow); color: #1E1B4B;
+      background: linear-gradient(135deg, #FFD700, #FBBF24);
+      color: #1E1B4B;
       font-weight: 700; padding: 16px;
       border-radius: 16px; text-align: center;
       font-size: 16px; margin: 20px 0;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+      box-shadow: 
+        0 6px 16px rgba(255, 215, 0, 0.4),
+        0 0 20px rgba(255, 215, 0, 0.3);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     /* Modal */
@@ -206,7 +232,7 @@
     .wallet-option img { width: 40px; height: 40px; border-radius: 12px; }
     .wallet-name { font-weight: 600; color: white; }
 
-    /* Extra Content */
+    /* Extra */
     .extra-content {
       padding: 20px 16px;
       background: var(--card);
@@ -215,7 +241,7 @@
       border: 1px solid var(--border);
       text-align: center;
     }
-    .extra-content h3 { font-size: 16px; margin-bottom:atrix: 10px; color: var(--yellow); }
+    .extra-content h3 { font-size: 16px; margin-bottom: 10px; color: var(--gold); }
     .extra-content p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
     @media (min-width: 480px) {
@@ -238,8 +264,11 @@
       </div>
     </div>
 
-    <!-- Big Circle Logo -->
-    <div class="logo-center"></div>
+    <!-- Big Circle + GLOWING NAME -->
+    <div class="logo-center">
+      <div class="logo-o">O</div>
+      <div class="logo-name">ZAPCHOK</div>
+    </div>
 
     <div class="topbar-right">
       <div class="topbar-btn" id="btn-staking" onclick="showSection('staking')">
@@ -294,8 +323,8 @@
       <div class="card">
         <div class="card-title">Stake USDC</div>
         <input type="number" placeholder="0.0" class="msg-input" style="margin-bottom:14px;">
-        <button class="btn" style="background:var(--yellow);color:#1E1B4B;">Stake</button>
-        <div class="status" style="color:var(--muted);margin-top:10px;">APY: <strong style="color:var(--yellow);">12.5%</strong></div>
+        <button class="btn" style="background:var(--gold);color:#1E1B4B;box-shadow:0 4px 12px rgba(255,215,0,0.4);">Stake</button>
+        <div class="status" style="color:var(--muted);margin-top:10px;">APY: <strong style="color:var(--gold);">12.5%</strong></div>
       </div>
     </div>
 
@@ -347,7 +376,7 @@
         await eth.request({ method: 'eth_requestAccounts' });
         provider = new ethers.providers.Web3Provider(eth);
         account = await provider.getSigner().getAddress();
-        document.getElementById('connect-btn').textContent = account.slice(0,6)+"..."+account.slice(-4);
+        document.getElementById('connect-btn').innerHTML = `<strong>${account.slice(0,6)}...${account.slice(-4)}</strong>`;
         document.getElementById('connect-btn').onclick = null;
         document.getElementById('swap-btn').disabled = false;
         document.getElementById('swap-btn').textContent = "Swap";
@@ -410,7 +439,7 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=18');
+      navigator.serviceWorker.register('/hello-arc-pwa/sw.js?v=19');
     }
   </script>
 </body>
